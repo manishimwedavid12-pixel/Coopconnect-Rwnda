@@ -10,28 +10,27 @@
 <!-- ================= FIREBASE SDK ================= -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-  import { getFirestore, collection, doc, getDocs, getDoc, setDoc, deleteDoc, query, where, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+  import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  import { getFirestore, collection, doc, getDocs, getDoc, setDoc, deleteDoc, updateDoc, addDoc, query, where, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
   // ============================================================
-  // ⚠️ SOSTITUER PAR TA CONFIGURATION FIREBASE
-  // Uyikura muri Firebase Console → Project Settings → Your apps
+  // ⚠️ CONFIG YAWE YA FIREBASE (nta mpinduka)
   // ============================================================
-const firebaseConfig = {
-  apiKey: "AIzaSyBundHtsiYqhvDt8Sr9e3onp1Fj9DYU_Uc",
-  authDomain: "coopconnect-rwanda.firebaseapp.com",
-  projectId: "coopconnect-rwanda",
-  storageBucket: "coopconnect-rwanda.firebasestorage.app",
-  messagingSenderId: "541021248668",
-  appId: "1:541021248668:web:2caba90d523d70189b2159"
-};
+  const firebaseConfig = {
+    apiKey: "AIzaSyBundHtsiYqhvDt8Sr9e3onp1Fj9DYU_Uc",
+    authDomain: "coopconnect-rwanda.firebaseapp.com",
+    projectId: "coopconnect-rwanda",
+    storageBucket: "coopconnect-rwanda.firebasestorage.app",
+    messagingSenderId: "541021248668",
+    appId: "1:541021248668:web:2caba90d523d70189b2159"
+  };
 
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
   const auth = getAuth(app);
 
-  window.FB = { db, auth, collection, doc, getDocs, getDoc, setDoc, deleteDoc, query, where, onSnapshot };
-  window.FB_AUTH = { auth, signInWithEmailAndPassword, signOut, onAuthStateChanged };
+  window.FB = { db, auth, collection, doc, getDocs, getDoc, setDoc, deleteDoc, updateDoc, addDoc, query, where, onSnapshot };
+  window.FB_AUTH = { auth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged };
   window.dispatchEvent(new Event("firebase-ready"));
 </script>
 
@@ -45,16 +44,19 @@ const firebaseConfig = {
 }
 body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); font-size: 14px; }
 
-.login-screen { position: fixed; inset: 0; background: linear-gradient(135deg, var(--green-dark) 0%, var(--green) 100%); display: flex; align-items: center; justify-content: center; padding: 20px; z-index: 999; }
-.login-card { background: #fff; border-radius: 20px; padding: 40px 32px; width: 100%; max-width: 440px; box-shadow: 0 20px 60px rgba(0,0,0,.3); }
+.login-screen { position: fixed; inset: 0; background: linear-gradient(135deg, var(--green-dark) 0%, var(--green) 100%); display: flex; align-items: center; justify-content: center; padding: 20px; z-index: 999; overflow-y: auto; }
+.login-card { background: #fff; border-radius: 20px; padding: 32px; width: 100%; max-width: 460px; box-shadow: 0 20px 60px rgba(0,0,0,.3); margin: auto; }
 .login-logo { display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 8px; }
 .login-logo i { color: var(--green); width: 36px; height: 36px; }
 .login-logo strong { font-size: 22px; color: var(--green-dark); }
-.login-card h2 { text-align: center; font-size: 15px; color: var(--muted); margin-bottom: 24px; font-weight: 400; }
-.login-card .field { margin-bottom: 16px; }
-.login-btn { width: 100%; justify-content: center; padding: 14px; font-size: 15px; }
-.login-hint { text-align: center; font-size: 12px; color: var(--muted); margin-top: 18px; padding-top: 18px; border-top: 1px solid var(--border); line-height: 1.8; }
-.login-hint code { background: #f1f5f9; padding: 2px 6px; border-radius: 4px; font-size: 11px; }
+.login-card h2 { text-align: center; font-size: 15px; color: var(--muted); margin-bottom: 20px; font-weight: 400; }
+.auth-tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 20px; background: #f1f5f9; padding: 5px; border-radius: 10px; }
+.auth-tab { padding: 11px; text-align: center; border-radius: 7px; cursor: pointer; font-weight: 600; font-size: 13px; color: var(--muted); transition: .2s; display: flex; align-items: center; justify-content: center; gap: 6px; }
+.auth-tab i { width: 15px; height: 15px; }
+.auth-tab.active { background: #fff; color: var(--green); box-shadow: 0 2px 6px rgba(0,0,0,.08); }
+.login-card .field { margin-bottom: 12px; }
+.login-btn { width: 100%; justify-content: center; padding: 13px; font-size: 15px; }
+.login-hint { text-align: center; font-size: 12px; color: var(--muted); margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border); line-height: 1.8; }
 
 .sidebar { position: fixed; top: 0; left: 0; width: 250px; height: 100vh; background: var(--green-dark); color: #fff; display: flex; flex-direction: column; z-index: 100; transition: transform .3s; }
 .logo { display: flex; align-items: center; gap: 12px; padding: 22px 20px; border-bottom: 1px solid rgba(255,255,255,.1); }
@@ -127,7 +129,7 @@ tbody tr:hover { background: #f8fafc; }
 .btn.ghost:hover { background: #e2e8f0; }
 .btn.danger { background: var(--red); color: #fff; }
 .btn.danger:hover { background: #b91c1c; }
-.btn.big { padding: 16px 28px; font-size: 16px; border-radius: 12px; }
+.btn.big { padding: 14px 24px; font-size: 15px; border-radius: 12px; }
 .toolbar { display: flex; flex-wrap: wrap; gap: 10px; justify-content: space-between; align-items: center; margin-bottom: 18px; }
 .toolbar-l, .toolbar-r { display: flex; gap: 10px; flex-wrap: wrap; }
 .input { padding: 10px 14px; border: 1px solid var(--border); border-radius: 9px; font-size: 13px; outline: none; font-family: inherit; background: #fff; }
@@ -162,10 +164,6 @@ tbody tr:hover { background: #f8fafc; }
 .notice.danger { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
 .notice.success { background: #dcfce7; color: #15803d; border: 1px solid #86efac; }
 .pwd-cell { font-family: monospace; background: #f1f5f9; padding: 3px 8px; border-radius: 5px; font-size: 11px; }
-.warn-box { background: #fef2f2; border: 2px solid #dc2626; padding: 16px; border-radius: 10px; margin: 14px 0; }
-.warn-box .warn-title { color: #991b1b; font-weight: 700; font-size: 14px; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
-.warn-box .warn-title i { width: 20px; height: 20px; }
-.warn-box .warn-text { color: #7f1d1d; font-size: 13px; line-height: 1.6; }
 .coop-card { background: #fff; border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 14px; }
 .coop-card-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
 .coop-card-head h3 { font-size: 15px; }
@@ -194,33 +192,88 @@ tbody tr:hover { background: #f8fafc; }
 </head>
 <body>
 
-<!-- LOGIN -->
+<!-- ============ LOGIN / SIGNUP SCREEN ============ -->
 <div class="login-screen" id="loginScreen">
   <div class="login-card">
     <div class="login-logo">
       <i data-lucide="landmark"></i>
       <strong>CoopConnect</strong>
     </div>
-    <h2>Injira muri sisitemu</h2>
-    <div class="field">
-      <label>Email</label>
-      <input class="input" id="loginId" placeholder="admin@coopconnect.rw" type="email" />
+    <h2 id="authSubtitle">Injira muri sisitemu</h2>
+
+    <!-- Tabs -->
+    <div class="auth-tabs">
+      <div class="auth-tab active" id="tabLogin" onclick="switchAuthMode('login')">
+        <i data-lucide="log-in"></i> Injira
+      </div>
+      <div class="auth-tab" id="tabSignup" onclick="switchAuthMode('signup')">
+        <i data-lucide="user-plus"></i> Fungura Account
+      </div>
     </div>
-    <div class="field">
-      <label>Ijambo ry'ibanga</label>
-      <input class="input" type="password" id="loginPass" placeholder="••••••" />
+
+    <!-- LOGIN FORM -->
+    <div id="loginForm">
+      <div class="field">
+        <label>Email</label>
+        <input class="input" id="loginId" placeholder="admin@coopconnect.rw" type="email" />
+      </div>
+      <div class="field">
+        <label>Ijambo ry'ibanga</label>
+        <input class="input" type="password" id="loginPass" placeholder="••••••" />
+      </div>
+      <button class="btn primary login-btn" onclick="doLogin()" id="loginBtn">
+        <i data-lucide="log-in"></i> Injira
+      </button>
+      <div class="login-hint">
+        Niba utarabona account, kanda <strong>"Fungura Account"</strong> hejuru.
+      </div>
     </div>
-    <button class="btn primary login-btn" onclick="doLogin()" id="loginBtn">
-      <i data-lucide="log-in"></i> Injira
-    </button>
-    <div class="login-hint">
-      Injira na email na password yawe ya Firebase.<br>
-      Niba utarabona account, vugana na Admin.
+
+    <!-- SIGNUP FORM -->
+    <div id="signupForm" class="hidden">
+      <div class="field">
+        <label>Izina ryuzuye *</label>
+        <input class="input" id="suName" placeholder="Urugero: Mukamana Aline" />
+      </div>
+      <div class="field">
+        <label>Email *</label>
+        <input class="input" id="suEmail" placeholder="aline@example.com" type="email" />
+      </div>
+      <div class="row">
+        <div class="field">
+          <label>Telefoni *</label>
+          <input class="input" id="suPhone" placeholder="0788..." />
+        </div>
+        <div class="field">
+          <label>Nimero ya member *</label>
+          <input class="input" id="suNo" placeholder="M-XXX" />
+        </div>
+      </div>
+      <div class="field">
+        <label>Koperative *</label>
+        <select class="input" id="suCoop">
+          <option value="">— Hitamo koperative —</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Ijambo ry'ibanga (nibura 6) *</label>
+        <input class="input" type="password" id="suPass" placeholder="••••••" />
+      </div>
+      <div class="field">
+        <label>Emeza ijambo ry'ibanga *</label>
+        <input class="input" type="password" id="suPass2" placeholder="••••••" />
+      </div>
+      <div class="notice info" style="font-size:12px">
+        ℹ️ Nyuma yo kwiyandikisha, <strong>Admin azareba</strong> ubusabe bwawe mbere yo kwinjira.
+      </div>
+      <button class="btn primary login-btn" onclick="doSignup()" id="signupBtn">
+        <i data-lucide="user-plus"></i> Fungura Account
+      </button>
     </div>
   </div>
 </div>
 
-<!-- APP -->
+<!-- ============ APP ============ -->
 <div id="app-root" class="hidden">
   <aside class="sidebar" id="sidebar">
     <div class="logo">
@@ -263,7 +316,7 @@ tbody tr:hover { background: #f8fafc; }
 
 <script>
 /* ============================================================
-   COOPCONNECT RWANDA — v4 (Firebase-Integrated)
+   COOPCONNECT RWANDA — v5 (Firebase + Sign up + Admin approval)
    ============================================================ */
 
 const $ = s => document.querySelector(s);
@@ -278,20 +331,13 @@ const addMonths = (dateStr, months) => {
   return d.toISOString().split("T")[0];
 };
 
-/* ============ DB MEMORY CACHE ============ */
 let DB = {
-  coops: [],
-  members: [],
-  contribs: [],
-  shares: [],
-  payments: [],
-  loans: [],
-  tx: [],
-  ann: [],
-  notifications: []
+  coops: [], members: [], contribs: [], shares: [],
+  payments: [], loans: [], tx: [], ann: [], notifications: []
 };
 
 let SESSION = null;
+let authMode = "login";
 
 /* ============ FIREBASE STATE ============ */
 let FB_READY = false;
@@ -316,11 +362,19 @@ async function getUserRole(uid) {
   }
 }
 
+async function loadCoopsPublic() {
+  if (!FB_READY) return;
+  try {
+    const { db, collection, getDocs } = window.FB;
+    const snap = await getDocs(collection(db, "coops"));
+    const arr = [];
+    snap.forEach(d => arr.push({ id: d.id, ...d.data() }));
+    DB.coops = arr;
+  } catch (e) { console.warn(e); }
+}
+
 async function fbLoadAll() {
-  if (!FB_READY) {
-    console.warn("Firebase not ready — using empty data");
-    return;
-  }
+  if (!FB_READY) return;
   const { db, collection, getDocs } = window.FB;
   for (const name of FB_COLLECTIONS) {
     try {
@@ -328,11 +382,8 @@ async function fbLoadAll() {
       const arr = [];
       snap.forEach(d => arr.push({ id: d.id, ...d.data() }));
       DB[name] = arr;
-    } catch (e) {
-      console.warn("Load failed:", name, e);
-    }
+    } catch (e) { console.warn("Load failed:", name, e); }
   }
-  console.log("✅ Data loaded from Firestore");
 }
 
 async function fbSaveAll() {
@@ -340,11 +391,8 @@ async function fbSaveAll() {
   const { db, doc, setDoc } = window.FB;
   for (const name of FB_COLLECTIONS) {
     for (const item of DB[name]) {
-      try {
-        await setDoc(doc(db, name, item.id), item, { merge: true });
-      } catch (e) {
-        console.warn("Save failed:", name, item.id, e);
-      }
+      try { await setDoc(doc(db, name, item.id), item, { merge: true }); }
+      catch (e) { console.warn("Save failed:", name, item.id, e); }
     }
   }
 }
@@ -356,23 +404,15 @@ function scheduleSave() {
   saveTimer = setTimeout(() => { fbSaveAll(); }, 800);
 }
 
-/* ============ NOTIFICATIONS HELPERS ============ */
+/* ============ NOTIFICATIONS ============ */
 function addNotification(memberName, title, body, type = "info") {
-  DB.notifications.push({
-    id: uid(), memberName, title, body, type,
-    date: today(), read: false
-  });
+  DB.notifications.push({ id: uid(), memberName, title, body, type, date: today(), read: false });
 }
 function getMyNotifications() {
   if (!SESSION) return [];
-  const list = DB.notifications.filter(n =>
-    n.memberName === SESSION.memberName || n.memberName === "ALL"
-  );
-  return list.slice().reverse();
+  return DB.notifications.filter(n => n.memberName === SESSION.memberName || n.memberName === "ALL").slice().reverse();
 }
-function countUnread() {
-  return getMyNotifications().filter(n => !n.read).length;
-}
+function countUnread() { return getMyNotifications().filter(n => !n.read).length; }
 function updateNotifDot() {
   const dot = $("#notifDot");
   if (!dot) return;
@@ -381,7 +421,24 @@ function updateNotifDot() {
   else { dot.style.display = "none"; }
 }
 
-/* ============ LOGIN (Firebase Auth) ============ */
+/* ============ SWITCH LOGIN/SIGNUP ============ */
+async function switchAuthMode(mode) {
+  authMode = mode;
+  $("#tabLogin").classList.toggle("active", mode === "login");
+  $("#tabSignup").classList.toggle("active", mode === "signup");
+  $("#loginForm").classList.toggle("hidden", mode !== "login");
+  $("#signupForm").classList.toggle("hidden", mode !== "signup");
+  $("#authSubtitle").textContent = mode === "login" ? "Injira muri sisitemu" : "Fungura account nshya";
+  if (mode === "signup") {
+    await loadCoopsPublic();
+    const sel = $("#suCoop");
+    sel.innerHTML = '<option value="">— Hitamo koperative —</option>' +
+      DB.coops.map(c => `<option value="${c.name}">${c.name}</option>`).join("");
+  }
+  icons();
+}
+
+/* ============ LOGIN ============ */
 async function doLogin() {
   const email = $("#loginId").value.trim();
   const pass = $("#loginPass").value.trim();
@@ -403,12 +460,26 @@ async function doLogin() {
       btn.disabled = false;
       btn.innerHTML = '<i data-lucide="log-in"></i> Injira';
       icons();
-      return toast("Nta role ibonetse muri Firestore (users). Vugana na Admin.", true);
+      return toast("Nta role ibonetse. Vugana na Admin.", true);
+    }
+
+    if (roleData.status === "pending") {
+      await window.FB_AUTH.signOut(window.FB_AUTH.auth);
+      btn.disabled = false;
+      btn.innerHTML = '<i data-lucide="log-in"></i> Injira';
+      icons();
+      return toast("⏳ Account yawe itegereje kwemezwa na Admin.", true);
+    }
+    if (roleData.status === "rejected") {
+      await window.FB_AUTH.signOut(window.FB_AUTH.auth);
+      btn.disabled = false;
+      btn.innerHTML = '<i data-lucide="log-in"></i> Injira';
+      icons();
+      return toast("❌ Account yawe yanzwe. Vugana na Admin.", true);
     }
 
     SESSION = {
-      uid: user.uid,
-      email: user.email,
+      uid: user.uid, email: user.email,
       name: roleData.name || user.email,
       role: roleData.role,
       memberName: roleData.memberName || null
@@ -429,15 +500,97 @@ async function doLogin() {
   }
 }
 
+/* ============ SIGNUP ============ */
+async function doSignup() {
+  const name = $("#suName").value.trim();
+  const email = $("#suEmail").value.trim();
+  const phone = $("#suPhone").value.trim();
+  const no = $("#suNo").value.trim();
+  const coop = $("#suCoop").value;
+  const pass = $("#suPass").value;
+  const pass2 = $("#suPass2").value;
+
+  if (!name) return toast("Izina ni ngombwa", true);
+  if (!email) return toast("Email ni ngombwa", true);
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return toast("Email ntariho neza", true);
+  if (!phone) return toast("Telefoni ni ngombwa", true);
+  if (!no) return toast("Nimero ya member ni ngombwa", true);
+  if (!coop) return toast("Hitamo koperative", true);
+  if (pass.length < 6) return toast("Password nibura 6 characters", true);
+  if (pass !== pass2) return toast("Password ntihura", true);
+
+  const btn = $("#signupBtn");
+  btn.disabled = true;
+  btn.innerHTML = '<i data-lucide="loader"></i> Tugutegereje...';
+  icons();
+
+  try {
+    // 1. Kora Firebase Auth user
+    const { createUserWithEmailAndPassword } = window.FB_AUTH;
+    const cred = await createUserWithEmailAndPassword(window.FB_AUTH.auth, email, pass);
+    const uid = cred.user.uid;
+
+    // 2. Bika muri users collection
+    const { db, doc, setDoc, collection, addDoc } = window.FB;
+    await setDoc(doc(db, "users", uid), {
+      uid, email, name,
+      role: "member",
+      status: "pending",
+      memberName: name,
+      phone,
+      createdAt: new Date().toISOString()
+    });
+
+    // 3. Bika mu members collection (pending)
+    await addDoc(collection(db, "members"), {
+      name, no, coop, phone, email,
+      joined: today(),
+      status: "pending",
+      uid,
+      createdAt: new Date().toISOString()
+    });
+
+    // 4. Notify admin
+    await addDoc(collection(db, "notifications"), {
+      memberName: "ALL",
+      title: "🆕 Ubusabe bw'account nshya",
+      body: `${name} (${email}) yisabye kwinjira muri ${coop}. Emeza cyangwa wange.`,
+      type: "warn",
+      date: today(),
+      read: false
+    });
+
+    // 5. Sohoka muri Firebase (ntabwo yinjiye — ategereje kwemezwa)
+    await window.FB_AUTH.signOut(window.FB_AUTH.auth);
+
+    toast("✅ Ubusabe bwoherejwe! Admin azakwemereza vuba.");
+    switchAuthMode("login");
+    $("#loginId").value = email;
+    $("#loginPass").value = "";
+  } catch (error) {
+    console.error(error);
+    let msg = "Habaye ikibazo";
+    if (error.code === "auth/email-already-in-use") msg = "Iyi email isanzweho";
+    if (error.code === "auth/invalid-email") msg = "Email ntariho neza";
+    if (error.code === "auth/weak-password") msg = "Password ni nkeya";
+    toast(msg, true);
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<i data-lucide="user-plus"></i> Fungura Account';
+    icons();
+  }
+}
+
+/* ============ LOGOUT ============ */
 async function logout() {
   if (!confirm("Uremeza gusohoka?")) return;
-  try {
-    await window.FB_AUTH.signOut(window.FB_AUTH.auth);
-  } catch (e) { console.warn(e); }
+  try { await window.FB_AUTH.signOut(window.FB_AUTH.auth); }
+  catch (e) { console.warn(e); }
   SESSION = null;
   location.reload();
 }
 
+/* ============ START APP ============ */
 function startApp() {
   if (!SESSION) return;
   $("#loginScreen").classList.add("hidden");
@@ -456,6 +609,7 @@ function startApp() {
 function buildSidebar() {
   const adminNav = [
     { page: "dashboard", icon: "layout-dashboard", label: "Ahabanza" },
+    { page: "pendingUsers", icon: "user-check", label: "Kwemeza abiyandikishije" },
     { page: "coops", icon: "building-2", label: "Amakoperative" },
     { page: "contributionWindow", icon: "calendar-clock", label: "Igihe cyo kwishura" },
     { page: "pendingPayments", icon: "shield-check", label: "Kwemeza ubwishyu" },
@@ -465,7 +619,6 @@ function buildSidebar() {
     { page: "shares", icon: "pie-chart", label: "Imigabane" },
     { page: "payments", icon: "credit-card", label: "Ubwishyu bwose" },
     { page: "finance", icon: "wallet", label: "Imari" },
-    { page: "reports", icon: "bar-chart-3", label: "Raporo" },
     { page: "announce", icon: "megaphone", label: "Ubutumwa rusange" },
     { page: "settings", icon: "settings", label: "Igenamiterere" }
   ];
@@ -564,6 +717,7 @@ PAGES.dashboard = () => {
   const totalBalance = coops.reduce((s,c) => s + (c.balance || 0), 0);
   const pendingCount = pay.filter(x => x.status === "pending").length;
   const pendingLoans = DB.loans.filter(l => l.status === "pending").length;
+  const pendingUsers = DB.members.filter(m => m.status === "pending").length;
   const stat = (ic, cl, lbl, val, page) => `
     <div class="stat ${page ? 'clickable' : ''}" ${page ? `onclick="navigate('${page}')"` : ''}>
       <div class="stat-icon ${cl}"><i data-lucide="${ic}"></i></div>
@@ -574,11 +728,10 @@ PAGES.dashboard = () => {
       ${stat("building-2", "g", "Amakoperative", coops.length, "coops")}
       ${stat("wallet", "b", "Balance yose", fmt(totalBalance), "coops")}
       ${stat("users", "b", "Abanyamuryango", mem.length, "members")}
+      ${stat("user-check", "o", "Abiyandikishije", pendingUsers, "pendingUsers")}
       ${stat("clock", "o", "Bitegereje", pendingCount, "pendingPayments")}
       ${stat("banknote", "o", "Inguzanyo zitegereje", pendingLoans, "adminLoans")}
       ${stat("hand-coins", "g", "Imisanzu yose", fmt(totalC), "contribs")}
-      ${stat("trending-up", "g", "Yinjiye", fmt(inc), "finance")}
-      ${stat("trending-down", "r", "Yasohotse", fmt(exp), "finance")}
     </div>
     <div class="grid-2">
       <div class="panel">
@@ -588,7 +741,8 @@ PAGES.dashboard = () => {
       <div class="panel">
         <div class="panel-head"><h2>Ibikorwa byihuse</h2></div>
         <div style="display:flex;flex-direction:column;gap:10px">
-          <button class="btn primary" onclick="navigate('contributionWindow')"><i data-lucide="calendar-clock"></i> Fungura igihe cyo kwishura</button>
+          <button class="btn primary" onclick="navigate('pendingUsers')"><i data-lucide="user-check"></i> Emeza abiyandikishije (${pendingUsers})</button>
+          <button class="btn ghost" onclick="navigate('contributionWindow')"><i data-lucide="calendar-clock"></i> Fungura igihe cyo kwishura</button>
           <button class="btn ghost" onclick="navigate('pendingPayments')"><i data-lucide="shield-check"></i> Emeza ubwishyu (${pendingCount})</button>
           <button class="btn ghost" onclick="navigate('adminLoans')"><i data-lucide="banknote"></i> Emeza inguzanyo (${pendingLoans})</button>
         </div>
@@ -610,6 +764,89 @@ PAGES.dashboard = () => {
   }, 100);
 };
 
+/* ==================== ADMIN: PENDING USERS ==================== */
+PAGES.pendingUsers = () => {
+  const pending = DB.members.filter(m => m.status === "pending");
+  $("#app").innerHTML = `
+    <div class="notice info">🆕 <strong>Abiyandikishije bategereje kwemezwa: ${pending.length}</strong></div>
+    ${pending.length ? `<div class="panel">
+      <div class="table-wrap"><table>
+        <thead><tr>
+          <th>Izina</th><th>Email</th><th>Telefoni</th><th>Koperative</th><th>Itariki</th><th>Actions</th>
+        </tr></thead>
+        <tbody>${pending.map(m => `<tr>
+          <td>${m.name}</td>
+          <td>${m.email || '-'}</td>
+          <td>${m.phone || '-'}</td>
+          <td>${m.coop || '-'}</td>
+          <td>${m.joined || '-'}</td>
+          <td>
+            <button class="btn primary" style="padding:8px 12px" onclick="approveUser('${m.id}')">
+              <i data-lucide="check"></i> Emeza
+            </button>
+            <button class="btn danger" style="padding:8px 12px" onclick="rejectUser('${m.id}')">
+              <i data-lucide="x"></i> Anga
+            </button>
+          </td>
+        </tr>`).join("")}</tbody>
+      </table></div>
+    </div>` : `<div class="panel"><div class="empty"><i data-lucide="user-check"></i><p>Nta busabe bushya 🎉</p></div></div>`}
+  `;
+  icons();
+};
+
+window.approveUser = async (memberId) => {
+  const m = DB.members.find(x => x.id === memberId);
+  if (!m) return;
+  try {
+    const { db, doc, updateDoc, collection, addDoc } = window.FB;
+    await updateDoc(doc(db, "members", m.id), { status: "active" });
+    if (m.uid) await updateDoc(doc(db, "users", m.uid), { status: "approved" });
+    const i = DB.members.findIndex(x => x.id === memberId);
+    if (i >= 0) DB.members[i].status = "active";
+    await addDoc(collection(db, "notifications"), {
+      memberName: m.name,
+      title: "✅ Account yawe yemejwe",
+      body: "Ubu urashobora kwinjira muri sisitemu. Murakaza neza!",
+      type: "success",
+      date: today(),
+      read: false
+    });
+    toast(`✅ ${m.name} yemejwe!`);
+    navigate("pendingUsers");
+  } catch (e) {
+    console.error(e);
+    toast("Habaye ikibazo. Ongera ugerageze.", true);
+  }
+};
+
+window.rejectUser = async (memberId) => {
+  const m = DB.members.find(x => x.id === memberId);
+  if (!m) return;
+  const reason = prompt("Impamvu yo kwanga (member azayibona):");
+  if (!reason) return;
+  try {
+    const { db, doc, updateDoc, collection, addDoc } = window.FB;
+    await updateDoc(doc(db, "members", m.id), { status: "rejected", rejectReason: reason });
+    if (m.uid) await updateDoc(doc(db, "users", m.uid), { status: "rejected" });
+    const i = DB.members.findIndex(x => x.id === memberId);
+    if (i >= 0) { DB.members[i].status = "rejected"; DB.members[i].rejectReason = reason; }
+    await addDoc(collection(db, "notifications"), {
+      memberName: m.name,
+      title: "❌ Account yawe yanzwe",
+      body: `Impamvu: ${reason}. Vugana na Admin.`,
+      type: "danger",
+      date: today(),
+      read: false
+    });
+    toast(`❌ ${m.name} yanzwe.`);
+    navigate("pendingUsers");
+  } catch (e) {
+    console.error(e);
+    toast("Habaye ikibazo", true);
+  }
+};
+
 /* ==================== ADMIN: COOPS ==================== */
 PAGES.coops = () => {
   const list = DB.coops;
@@ -626,7 +863,7 @@ PAGES.coops = () => {
           <span class="badge-info">Balance: ${fmt(c.balance || 0)}</span>
         </div>
         <div class="coop-stats">
-          <div><small>Abanyamuryango</small><strong>${DB.members.filter(m => m.coop === c.name).length}</strong></div>
+          <div><small>Abanyamuryango</small><strong>${DB.members.filter(m => m.coop === c.name && m.status === 'active').length}</strong></div>
           <div><small>Imisanzu</small><strong>${fmt(DB.contribs.filter(x => x.coop === c.name && x.status === 'confirmed').reduce((s,x) => s + +x.amount, 0))}</strong></div>
         </div>
         <div style="display:flex;gap:8px;flex-wrap:wrap">
@@ -952,7 +1189,7 @@ window.finalRejectLoan = (id) => {
 
 /* ==================== ADMIN: MEMBERS ==================== */
 PAGES.members = () => {
-  const list = DB.members;
+  const list = DB.members.filter(m => m.status !== "pending");
   $("#app").innerHTML = `
     <div class="toolbar">
       <div class="toolbar-l"><input class="input" id="s" placeholder="Shakisha..."></div>
@@ -1018,7 +1255,7 @@ window.delMember = (id) => {
   toast("Byasibwe"); scheduleSave(); navigate("members");
 };
 
-/* ==================== ADMIN: CONTRIBS / SHARES / PAYMENTS / FINANCE / REPORTS / ANNOUNCE / SETTINGS ==================== */
+/* ==================== ADMIN: OTHER ==================== */
 PAGES.contribs = () => {
   $("#app").innerHTML = `
     <div class="panel"><div class="table-wrap"><table>
@@ -1073,13 +1310,6 @@ PAGES.finance = () => {
       </tr>`).join("") || `<tr><td colspan="4" class="empty">Nta bikorwa</td></tr>`}</tbody>
     </table></div></div>
   `;
-};
-
-PAGES.reports = () => {
-  $("#app").innerHTML = `<div class="panel"><div class="panel-head"><h2>Raporo</h2></div>
-    <button class="btn primary" onclick="window.print()"><i data-lucide="printer"></i> Printa</button>
-  </div>`;
-  icons();
 };
 
 PAGES.announce = () => {
