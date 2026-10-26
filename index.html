@@ -3,36 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CoopConnect Rwanda</title>
+<title>CoopConnect Rwanda - v8</title>
 <script src="https://unpkg.com/lucide@latest"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-<!-- ================= FIREBASE SDK ================= -->
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-  import { getFirestore, collection, doc, getDocs, getDoc, setDoc, deleteDoc, updateDoc, addDoc, query, where, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-
-  // ============================================================
-  // ⚠️ CONFIG YAWE YA FIREBASE (nta mpinduka)
-  // ============================================================
- const firebaseConfig = {
-  apiKey: "AIzaSyA7OfUycQUBA39tZu_bRO3VHdE3m_gxp_Q",
-  authDomain: "coopconnect-rwanda-78799.firebaseapp.com",
-  projectId: "coopconnect-rwanda-78799",
-  storageBucket: "coopconnect-rwanda-78799.firebasestorage.app",
-  messagingSenderId: "636839006720",
-  appId: "1:636839006720:web:e3b4f666616d6600133ee5"
-};
-
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
-  const auth = getAuth(app);
-
-  window.FB = { db, auth, collection, doc, getDocs, getDoc, setDoc, deleteDoc, updateDoc, addDoc, query, where, onSnapshot };
-  window.FB_AUTH = { auth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged };
-  window.dispatchEvent(new Event("firebase-ready"));
-</script>
+<!-- ================= FIREBASE SDK (USING COMPAT for file:// support) ================= -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -43,7 +21,6 @@
   --radius: 14px; --shadow: 0 1px 3px rgba(0,0,0,.08);
 }
 body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); font-size: 14px; }
-
 .login-screen { position: fixed; inset: 0; background: linear-gradient(135deg, var(--green-dark) 0%, var(--green) 100%); display: flex; align-items: center; justify-content: center; padding: 20px; z-index: 999; overflow-y: auto; }
 .login-card { background: #fff; border-radius: 20px; padding: 32px; width: 100%; max-width: 460px; box-shadow: 0 20px 60px rgba(0,0,0,.3); margin: auto; }
 .login-logo { display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 8px; }
@@ -57,7 +34,6 @@ body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); co
 .login-card .field { margin-bottom: 12px; }
 .login-btn { width: 100%; justify-content: center; padding: 13px; font-size: 15px; }
 .login-hint { text-align: center; font-size: 12px; color: var(--muted); margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border); line-height: 1.8; }
-
 .sidebar { position: fixed; top: 0; left: 0; width: 250px; height: 100vh; background: var(--green-dark); color: #fff; display: flex; flex-direction: column; z-index: 100; transition: transform .3s; }
 .logo { display: flex; align-items: center; gap: 12px; padding: 22px 20px; border-bottom: 1px solid rgba(255,255,255,.1); }
 .logo i { color: #4ade80; width: 28px; height: 28px; }
@@ -75,7 +51,6 @@ body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); co
 .user-box button:hover { background: var(--red); }
 .avatar { width: 38px; height: 38px; border-radius: 50%; background: var(--green); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; color: #fff; flex-shrink: 0; }
 .avatar.sm { width: 32px; height: 32px; font-size: 11px; }
-
 .main { margin-left: 250px; min-height: 100vh; }
 .topbar { position: sticky; top: 0; height: 66px; background: #fff; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 24px; z-index: 50; }
 .left { display: flex; align-items: center; gap: 12px; }
@@ -91,7 +66,6 @@ body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); co
 .profile { display: flex; align-items: center; gap: 8px; padding-left: 10px; border-left: 1px solid var(--border); }
 .profile span { font-size: 13px; font-weight: 600; }
 .content { padding: 24px; }
-
 .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 16px; margin-bottom: 24px; }
 .stat { background: var(--card); border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow); display: flex; align-items: center; gap: 14px; border: 1px solid var(--border); transition: transform .2s; }
 .stat:hover { transform: translateY(-2px); }
@@ -146,7 +120,7 @@ tbody tr:hover { background: #f8fafc; }
 .modal h3 { font-size: 17px; margin-bottom: 18px; }
 .modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; flex-wrap: wrap; }
 .toasts { position: fixed; bottom: 20px; right: 20px; display: flex; flex-direction: column; gap: 10px; z-index: 300; }
-.toast { background: var(--green-dark); color: #fff; padding: 12px 18px; border-radius: 10px; font-size: 13px; box-shadow: 0 4px 12px rgba(0,0,0,.15); animation: slide .3s; min-width: 220px; }
+.toast { background: var(--green-dark); color: #fff; padding: 12px 18px; border-radius: 10px; font-size: 13px; box-shadow: 0 4px 12px rgba(0,0,0,.15); animation: slide .3s; min-width: 220px; max-width: 400px; word-wrap: break-word;}
 .toast.error { background: var(--red); }
 @keyframes slide { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
 .act { background: #f1f5f9; border: none; width: 30px; height: 30px; border-radius: 7px; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; color: var(--muted); margin-right: 4px; }
@@ -201,7 +175,6 @@ tbody tr:hover { background: #f8fafc; }
     </div>
     <h2 id="authSubtitle">Injira muri sisitemu</h2>
 
-    <!-- Tabs -->
     <div class="auth-tabs">
       <div class="auth-tab active" id="tabLogin" onclick="switchAuthMode('login')">
         <i data-lucide="log-in"></i> Injira
@@ -211,7 +184,6 @@ tbody tr:hover { background: #f8fafc; }
       </div>
     </div>
 
-    <!-- LOGIN FORM -->
     <div id="loginForm">
       <div class="field">
         <label>Email</label>
@@ -221,7 +193,7 @@ tbody tr:hover { background: #f8fafc; }
         <label>Ijambo ry'ibanga</label>
         <input class="input" type="password" id="loginPass" placeholder="••••••" />
       </div>
-      <button class="btn primary login-btn" onclick="doLogin()" id="loginBtn">
+      <button class="btn primary login-btn" id="loginBtn">
         <i data-lucide="log-in"></i> Injira
       </button>
       <div class="login-hint">
@@ -229,7 +201,6 @@ tbody tr:hover { background: #f8fafc; }
       </div>
     </div>
 
-    <!-- SIGNUP FORM -->
     <div id="signupForm" class="hidden">
       <div class="field">
         <label>Izina ryuzuye *</label>
@@ -266,7 +237,7 @@ tbody tr:hover { background: #f8fafc; }
       <div class="notice info" style="font-size:12px">
         ℹ️ Nyuma yo kwiyandikisha, <strong>Admin azareba</strong> ubusabe bwawe mbere yo kwinjira.
       </div>
-      <button class="btn primary login-btn" onclick="doSignup()" id="signupBtn">
+      <button class="btn primary login-btn" id="signupBtn">
         <i data-lucide="user-plus"></i> Fungura Account
       </button>
     </div>
@@ -316,7 +287,7 @@ tbody tr:hover { background: #f8fafc; }
 
 <script>
 /* ============================================================
-   COOPCONNECT RWANDA — v5 (Firebase + Sign up + Admin approval)
+   COOPCONNECT RWANDA — v8 (Firebase Compat + LocalStorage Fallback)
    ============================================================ */
 
 const $ = s => document.querySelector(s);
@@ -324,183 +295,146 @@ const $$ = s => document.querySelectorAll(s);
 const uid = () => "id" + Date.now() + Math.random().toString(36).slice(2,7);
 const fmt = n => Number(n||0).toLocaleString() + " RWF";
 const today = () => new Date().toISOString().split("T")[0];
-const icons = () => window.lucide && lucide.createIcons();
+const icons = () => { try { window.lucide && lucide.createIcons(); } catch(e){} };
 const addMonths = (dateStr, months) => {
   const d = new Date(dateStr);
   d.setMonth(d.getMonth() + months);
   return d.toISOString().split("T")[0];
 };
 
-let DB = {
-  coops: [], members: [], contribs: [], shares: [],
-  payments: [], loans: [], tx: [], ann: [], notifications: []
+// ==================== FIREBASE CONFIG ====================
+const firebaseConfig = {
+  apiKey: "AIzaSyA7OfUycQUBA39tZu_bRO3VHdE3m_gxp_Q",
+  authDomain: "coopconnect-rwanda-78799.firebaseapp.com",
+  projectId: "coopconnect-rwanda-78799",
+  storageBucket: "coopconnect-rwanda-78799.firebasestorage.app",
+  messagingSenderId: "636839006720",
+  appId: "1:636839006720:web:e3b4f666616d6600133ee5"
 };
 
+let db, auth, isFirebaseReady = false;
+
+try {
+  firebase.initializeApp(firebaseConfig);
+  db = firebase.firestore();
+  auth = firebase.auth();
+  isFirebaseReady = true;
+  console.log("✅ Firebase Compat yiteguye");
+} catch (e) {
+  console.warn("⚠️ Firebase ntiyashoboye gutangira, turakoresha LocalStorage gusa.", e);
+}
+
+// ==================== STATE & LOCAL STORAGE ====================
+let DB = { coops: [], members: [], contribs: [], shares: [], payments: [], loans: [], tx: [], ann: [], notifications: [], users: [] };
 let SESSION = null;
-let authMode = "login";
 
-/* ============ FIREBASE STATE ============ */
-let FB_READY = false;
-window.addEventListener("firebase-ready", () => {
-  FB_READY = true;
-  console.log("✅ Firebase ready");
-});
-
-const FB_COLLECTIONS = ["coops","members","contribs","shares","payments","loans","tx","ann","notifications"];
-
-/* ============ FIREBASE HELPERS ============ */
-async function getUserRole(uid) {
-  if (!FB_READY) return null;
-  try {
-    const { doc, getDoc } = window.FB;
-    const userDoc = await getDoc(doc(window.FB.db, "users", uid));
-    if (userDoc.exists()) return userDoc.data();
-    return null;
-  } catch (e) {
-    console.warn("getUserRole failed:", e);
-    return null;
+function saveLocal() {
+  localStorage.setItem("coopconnect_db", JSON.stringify(DB));
+}
+function loadLocal() {
+  const data = localStorage.getItem("coopconnect_db");
+  if (data) {
+    try { DB = JSON.parse(data); } catch(e){}
   }
+  if (!DB.coops) DB.coops = [];
+  if (!DB.users) DB.users = [];
 }
 
-async function loadCoopsPublic() {
-  if (!FB_READY) return;
-  try {
-    const { db, collection, getDocs } = window.FB;
-    const snap = await getDocs(collection(db, "coops"));
-    const arr = [];
-    snap.forEach(d => arr.push({ id: d.id, ...d.data() }));
-    DB.coops = arr;
-  } catch (e) { console.warn(e); }
-}
-
-async function fbLoadAll() {
-  if (!FB_READY) return;
-  const { db, collection, getDocs } = window.FB;
-  for (const name of FB_COLLECTIONS) {
-    try {
-      const snap = await getDocs(collection(db, name));
-      const arr = [];
-      snap.forEach(d => arr.push({ id: d.id, ...d.data() }));
-      DB[name] = arr;
-    } catch (e) { console.warn("Load failed:", name, e); }
+// ==================== TOAST ====================
+function toast(msg, err) {
+  let host = document.getElementById("toasts");
+  if (!host) {
+    host = document.createElement("div");
+    host.id = "toasts"; host.className = "toasts"; document.body.appendChild(host);
   }
+  const el = document.createElement("div");
+  el.className = "toast" + (err ? " error" : "");
+  el.textContent = msg;
+  host.appendChild(el);
+  setTimeout(() => el.remove(), 5000);
 }
+window.toast = toast;
 
-async function fbSaveAll() {
-  if (!FB_READY) return;
-  const { db, doc, setDoc } = window.FB;
-  for (const name of FB_COLLECTIONS) {
-    for (const item of DB[name]) {
-      try { await setDoc(doc(db, name, item.id), item, { merge: true }); }
-      catch (e) { console.warn("Save failed:", name, item.id, e); }
-    }
-  }
-}
-
-let saveTimer = null;
-function scheduleSave() {
-  if (!FB_READY) return;
-  clearTimeout(saveTimer);
-  saveTimer = setTimeout(() => { fbSaveAll(); }, 800);
-}
-
-/* ============ NOTIFICATIONS ============ */
-function addNotification(memberName, title, body, type = "info") {
-  DB.notifications.push({ id: uid(), memberName, title, body, type, date: today(), read: false });
-}
-function getMyNotifications() {
-  if (!SESSION) return [];
-  return DB.notifications.filter(n => n.memberName === SESSION.memberName || n.memberName === "ALL").slice().reverse();
-}
-function countUnread() { return getMyNotifications().filter(n => !n.read).length; }
-function updateNotifDot() {
-  const dot = $("#notifDot");
-  if (!dot) return;
-  const c = countUnread();
-  if (c > 0) { dot.style.display = "flex"; dot.textContent = c; }
-  else { dot.style.display = "none"; }
-}
-
-/* ============ SWITCH LOGIN/SIGNUP ============ */
-async function switchAuthMode(mode) {
-  authMode = mode;
+// ==================== TABS ====================
+function switchAuthMode(mode) {
   $("#tabLogin").classList.toggle("active", mode === "login");
   $("#tabSignup").classList.toggle("active", mode === "signup");
   $("#loginForm").classList.toggle("hidden", mode !== "login");
   $("#signupForm").classList.toggle("hidden", mode !== "signup");
   $("#authSubtitle").textContent = mode === "login" ? "Injira muri sisitemu" : "Fungura account nshya";
+  
   if (mode === "signup") {
-    await loadCoopsPublic();
     const sel = $("#suCoop");
     sel.innerHTML = '<option value="">— Hitamo koperative —</option>' +
       DB.coops.map(c => `<option value="${c.name}">${c.name}</option>`).join("");
+    if(DB.coops.length === 0) {
+        sel.innerHTML += '<option value="Coop Nshya">Coop Nshya</option>';
+    }
   }
   icons();
 }
+window.switchAuthMode = switchAuthMode;
 
-/* ============ LOGIN ============ */
+// ==================== LOGIN ====================
 async function doLogin() {
   const email = $("#loginId").value.trim();
   const pass = $("#loginPass").value.trim();
-  if (!email || !pass) return toast("Uzuza ibisabwa", true);
+
+  if (!email || !pass) return toast("⚠️ Uzuza email na password mbere", true);
 
   const btn = $("#loginBtn");
   btn.disabled = true;
-  btn.innerHTML = '<i data-lucide="loader"></i> Tugutegereje...';
-  icons();
+  btn.innerHTML = '<i data-lucide="loader"></i> Tugutegereje...'; icons();
 
   try {
-    const { signInWithEmailAndPassword } = window.FB_AUTH;
-    const userCredential = await signInWithEmailAndPassword(window.FB_AUTH.auth, email, pass);
-    const user = userCredential.user;
+    let userData = null;
 
-    const roleData = await getUserRole(user.uid);
-    if (!roleData) {
-      await window.FB_AUTH.signOut(window.FB_AUTH.auth);
-      btn.disabled = false;
-      btn.innerHTML = '<i data-lucide="log-in"></i> Injira';
-      icons();
-      return toast("Nta role ibonetse. Vugana na Admin.", true);
+    // 1. Gerageza Firebase niba ihari
+    if (isFirebaseReady) {
+      try {
+        const cred = await auth.signInWithEmailAndPassword(email, pass);
+        const doc = await db.collection("users").doc(cred.user.uid).get();
+        if (doc.exists) userData = doc.data();
+      } catch (e) {
+        console.warn("Firebase yanze, turagerageza LocalStorage...", e);
+      }
     }
 
-    if (roleData.status === "pending") {
-      await window.FB_AUTH.signOut(window.FB_AUTH.auth);
-      btn.disabled = false;
-      btn.innerHTML = '<i data-lucide="log-in"></i> Injira';
-      icons();
-      return toast("⏳ Account yawe itegereje kwemezwa na Admin.", true);
+    // 2. Niba Firebase yanze (kuri file://) cyangwa nta user, reba LocalStorage
+    if (!userData) {
+      const localUser = DB.users.find(u => u.email === email && u.password === pass);
+      if (localUser) {
+        userData = localUser;
+      } else {
+        throw new Error("Email cyangwa password si byo.");
+      }
     }
-    if (roleData.status === "rejected") {
-      await window.FB_AUTH.signOut(window.FB_AUTH.auth);
-      btn.disabled = false;
-      btn.innerHTML = '<i data-lucide="log-in"></i> Injira';
-      icons();
-      return toast("❌ Account yawe yanzwe. Vugana na Admin.", true);
-    }
+
+    if (userData.status === "pending") throw new Error("⏳ Account yawe itegereje kwemezwa na Admin.");
+    if (userData.status === "rejected") throw new Error("❌ Account yawe yanzwe.");
 
     SESSION = {
-      uid: user.uid, email: user.email,
-      name: roleData.name || user.email,
-      role: roleData.role,
-      memberName: roleData.memberName || null
+      uid: userData.uid || uid(),
+      email: userData.email,
+      name: userData.name,
+      role: userData.role,
+      memberName: userData.memberName || null
     };
 
-    await fbLoadAll();
-    startApp();
+    await fbLoadAll(); // Fungura amakuru yose
+    toast("🟢 Turakingura sisitemu...");
+    setTimeout(startApp, 500);
+    
   } catch (error) {
     console.error(error);
     btn.disabled = false;
-    btn.innerHTML = '<i data-lucide="log-in"></i> Injira';
-    icons();
-    let msg = "Email cyangwa password si byo";
-    if (error.code === "auth/user-not-found") msg = "Nta account ibonetse kuri iyi email";
-    if (error.code === "auth/wrong-password") msg = "Password si yo";
-    if (error.code === "auth/invalid-email") msg = "Email ntariho neza";
-    toast(msg, true);
+    btn.innerHTML = '<i data-lucide="log-in"></i> Injira'; icons();
+    toast("❌ " + error.message, true);
   }
 }
+window.doLogin = doLogin;
 
-/* ============ SIGNUP ============ */
+// ==================== SIGNUP ====================
 async function doSignup() {
   const name = $("#suName").value.trim();
   const email = $("#suEmail").value.trim();
@@ -510,87 +444,115 @@ async function doSignup() {
   const pass = $("#suPass").value;
   const pass2 = $("#suPass2").value;
 
-  if (!name) return toast("Izina ni ngombwa", true);
-  if (!email) return toast("Email ni ngombwa", true);
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return toast("Email ntariho neza", true);
-  if (!phone) return toast("Telefoni ni ngombwa", true);
-  if (!no) return toast("Nimero ya member ni ngombwa", true);
-  if (!coop) return toast("Hitamo koperative", true);
-  if (pass.length < 6) return toast("Password nibura 6 characters", true);
-  if (pass !== pass2) return toast("Password ntihura", true);
+  if (!name || !email || !phone || !no || !coop || !pass) return toast("⚠️ Uzuza ibisabwa byose", true);
+  if (pass !== pass2) return toast("⚠️ Password ntihura", true);
+  if (pass.length < 6) return toast("⚠️ Password nibura 6 characters", true);
 
   const btn = $("#signupBtn");
   btn.disabled = true;
-  btn.innerHTML = '<i data-lucide="loader"></i> Tugutegereje...';
-  icons();
+  btn.innerHTML = '<i data-lucide="loader"></i> Tugutegereje...'; icons();
 
   try {
-    // 1. Kora Firebase Auth user
-    const { createUserWithEmailAndPassword } = window.FB_AUTH;
-    const cred = await createUserWithEmailAndPassword(window.FB_AUTH.auth, email, pass);
-    const uid = cred.user.uid;
+    const newUser = {
+      uid: uid(),
+      email, name, phone, role: "member", status: "pending",
+      memberName: name, password: pass, createdAt: today()
+    };
 
-    // 2. Bika muri users collection
-    const { db, doc, setDoc, collection, addDoc } = window.FB;
-    await setDoc(doc(db, "users", uid), {
-      uid, email, name,
-      role: "member",
-      status: "pending",
-      memberName: name,
-      phone,
-      createdAt: new Date().toISOString()
+    // Bika muri LocalStorage
+    DB.users.push(newUser);
+    
+    // Bika muri members
+    DB.members.push({
+      id: uid(), name, no, coop, phone, email, joined: today(), status: "pending", uid: newUser.uid
     });
 
-    // 3. Bika mu members collection (pending)
-    await addDoc(collection(db, "members"), {
-      name, no, coop, phone, email,
-      joined: today(),
-      status: "pending",
-      uid,
-      createdAt: new Date().toISOString()
+    DB.notifications.push({
+      id: uid(), memberName: "ALL", title: "🆕 Ubusabe bw'account nshya",
+      body: `${name} (${email}) yisabye kwinjira muri ${coop}.`, type: "warn", date: today(), read: false
     });
+    
+    saveLocal();
 
-    // 4. Notify admin
-    await addDoc(collection(db, "notifications"), {
-      memberName: "ALL",
-      title: "🆕 Ubusabe bw'account nshya",
-      body: `${name} (${email}) yisabye kwinjira muri ${coop}. Emeza cyangwa wange.`,
-      type: "warn",
-      date: today(),
-      read: false
-    });
+    // Bika muri Firebase niba ihari
+    if (isFirebaseReady) {
+      try {
+        const cred = await auth.createUserWithEmailAndPassword(email, pass);
+        await db.collection("users").doc(cred.user.uid).set({ ...newUser, uid: cred.user.uid });
+        await db.collection("members").add({ name, no, coop, phone, email, joined: today(), status: "pending", uid: cred.user.uid });
+        await auth.signOut();
+      } catch (e) { console.warn("Firebase signup yanze", e); }
+    }
 
-    // 5. Sohoka muri Firebase (ntabwo yinjiye — ategereje kwemezwa)
-    await window.FB_AUTH.signOut(window.FB_AUTH.auth);
-
-    toast("✅ Ubusabe bwoherejwe! Admin azakwemereza vuba.");
+    toast("✅ Ubusabe bwoherejwe! Tegereza Admin.", false);
+    
     switchAuthMode("login");
     $("#loginId").value = email;
     $("#loginPass").value = "";
+    
+    setTimeout(() => toast("⏳ Admin agomba kwemeza ubusabe bwawe mbere yo kwinjira.", true), 2000);
+
   } catch (error) {
     console.error(error);
-    let msg = "Habaye ikibazo";
-    if (error.code === "auth/email-already-in-use") msg = "Iyi email isanzweho";
-    if (error.code === "auth/invalid-email") msg = "Email ntariho neza";
-    if (error.code === "auth/weak-password") msg = "Password ni nkeya";
-    toast(msg, true);
+    toast("❌ " + error.message, true);
   } finally {
     btn.disabled = false;
-    btn.innerHTML = '<i data-lucide="user-plus"></i> Fungura Account';
-    icons();
+    btn.innerHTML = '<i data-lucide="user-plus"></i> Fungura Account'; icons();
+  }
+}
+window.doSignup = doSignup;
+
+// ==================== LOAD / SAVE DATA ====================
+async function fbLoadAll() {
+  loadLocal(); // Kura amakuru muri LocalStorage mbere
+  if (isFirebaseReady && auth.currentUser) {
+    try {
+      const collections = ["coops","members","contribs","shares","payments","loans","tx","ann","notifications"];
+      for (const name of collections) {
+        const snap = await db.collection(name).get();
+        const arr = []; snap.forEach(d => arr.push({ id: d.id, ...d.data() }));
+        if (arr.length > 0) DB[name] = arr; // Niba Firebase ifite amakuru, iyafate
+      }
+    } catch(e) { console.warn("Firebase load error", e); }
   }
 }
 
-/* ============ LOGOUT ============ */
+function scheduleSave() {
+  saveLocal(); // Bika muri LocalStorage ako kanya
+  if (isFirebaseReady && auth.currentUser) {
+    try {
+      const collections = ["coops","members","contribs","shares","payments","loans","tx","ann","notifications"];
+      collections.forEach(name => {
+        DB[name].forEach(async item => {
+          await db.collection(name).doc(item.id).set(item, { merge: true });
+        });
+      });
+    } catch(e) { console.warn("Firebase save error", e); }
+  }
+}
+
+/* ============ NOTIFICATIONS ============ */
+function getMyNotifications() {
+  if (!SESSION) return [];
+  return DB.notifications.filter(n => n.memberName === SESSION.memberName || n.memberName === "ALL" || (SESSION.role === "admin" && n.memberName === "ALL")).slice().reverse();
+}
+function updateNotifDot() {
+  const dot = $("#notifDot");
+  if (!dot) return;
+  const c = getMyNotifications().filter(n => !n.read).length;
+  if (c > 0) { dot.style.display = "flex"; dot.textContent = c; }
+  else { dot.style.display = "none"; }
+}
+
+/* ============ LOGOUT & START APP ============ */
 async function logout() {
   if (!confirm("Uremeza gusohoka?")) return;
-  try { await window.FB_AUTH.signOut(window.FB_AUTH.auth); }
-  catch (e) { console.warn(e); }
+  if (isFirebaseReady) try { await auth.signOut(); } catch(e){}
   SESSION = null;
   location.reload();
 }
+window.logout = logout;
 
-/* ============ START APP ============ */
 function startApp() {
   if (!SESSION) return;
   $("#loginScreen").classList.add("hidden");
@@ -658,14 +620,8 @@ function navigate(page) {
   render(page);
   updateNotifDot();
 }
+window.navigate = navigate;
 
-function toast(msg, err) {
-  const el = document.createElement("div");
-  el.className = "toast" + (err ? " error" : "");
-  el.textContent = msg;
-  $("#toasts").appendChild(el);
-  setTimeout(() => el.remove(), 3500);
-}
 function openModal(html) {
   $("#modal").innerHTML = html;
   $("#modalBg").classList.add("open");
@@ -675,17 +631,12 @@ function closeModal() {
   $("#modalBg").classList.remove("open");
   $("#modal").innerHTML = "";
 }
+window.openModal = openModal;
+window.closeModal = closeModal;
 $("#modalBg").addEventListener("click", e => { if (e.target.id === "modalBg") closeModal(); });
 
 $("#menuBtn").onclick = () => { $("#sidebar").classList.add("open"); $("#overlay").classList.add("open"); };
 $("#overlay").onclick = () => { $("#sidebar").classList.remove("open"); $("#overlay").classList.remove("open"); };
-
-let lang = "rw";
-$("#langBtn").onclick = () => {
-  lang = lang === "rw" ? "en" : "rw";
-  $("#langBtn").textContent = lang.toUpperCase();
-  toast(lang === "en" ? "Language: English" : "Ururimi: Ikinyarwanda");
-};
 
 $("#notifBtn").onclick = () => {
   const list = getMyNotifications();
@@ -693,8 +644,7 @@ $("#notifBtn").onclick = () => {
     <h3>Ubutumwa (${list.length})</h3>
     ${list.length ? list.map(n => `
       <div class="notif-card ${n.type}" style="margin-bottom:10px">
-        <strong>${n.title}</strong>
-        <p>${n.body}</p>
+        <strong>${n.title}</strong><p>${n.body}</p>
         <small>${n.date} ${!n.read ? '• <span style="color:#2563eb;font-weight:600">Bushya</span>' : ''}</small>
       </div>
     `).join("") : '<div class="empty"><i data-lucide="bell-off"></i><p>Nta butumwa</p></div>'}
@@ -707,23 +657,22 @@ $("#notifBtn").onclick = () => {
 
 const PAGES = {};
 
-/* ==================== ADMIN: DASHBOARD ==================== */
+/* ==================== ADMIN PAGES ==================== */
 PAGES.dashboard = () => {
-  const coops = DB.coops, mem = DB.members;
-  const con = DB.contribs, tx = DB.tx, pay = DB.payments;
+  const coops = DB.coops, mem = DB.members, con = DB.contribs, pay = DB.payments;
   const totalC = con.filter(x => x.status === "confirmed").reduce((s,x) => s + +x.amount, 0);
-  const inc = tx.filter(x => x.type === "income").reduce((s,x) => s + +x.amount, 0);
-  const exp = tx.filter(x => x.type === "expense").reduce((s,x) => s + +x.amount, 0);
   const totalBalance = coops.reduce((s,c) => s + (c.balance || 0), 0);
   const pendingCount = pay.filter(x => x.status === "pending").length;
   const pendingLoans = DB.loans.filter(l => l.status === "pending").length;
   const pendingUsers = DB.members.filter(m => m.status === "pending").length;
+  
   const stat = (ic, cl, lbl, val, page) => `
     <div class="stat ${page ? 'clickable' : ''}" ${page ? `onclick="navigate('${page}')"` : ''}>
       <div class="stat-icon ${cl}"><i data-lucide="${ic}"></i></div>
       <div class="stat-info"><small>${lbl}</small><strong>${val}</strong></div></div>`;
+  
   $("#app").innerHTML = `
-    <div class="notice info">👤 Uri kwinjira nka <strong>Admin (Umuyobozi)</strong> — ${SESSION.email}</div>
+    <div class="notice info">👤 Uri kwinjira nka <strong>Admin</strong> — ${SESSION.email}</div>
     <div class="stats">
       ${stat("building-2", "g", "Amakoperative", coops.length, "coops")}
       ${stat("wallet", "b", "Balance yose", fmt(totalBalance), "coops")}
@@ -734,12 +683,8 @@ PAGES.dashboard = () => {
       ${stat("hand-coins", "g", "Imisanzu yose", fmt(totalC), "contribs")}
     </div>
     <div class="grid-2">
-      <div class="panel">
-        <div class="panel-head"><h2>Imari mu mezi</h2></div>
-        <div class="chart-box"><canvas id="chart1"></canvas></div>
-      </div>
-      <div class="panel">
-        <div class="panel-head"><h2>Ibikorwa byihuse</h2></div>
+      <div class="panel"><div class="panel-head"><h2>Imari mu mezi</h2></div><div class="chart-box"><canvas id="chart1"></canvas></div></div>
+      <div class="panel"><div class="panel-head"><h2>Ibikorwa byihuse</h2></div>
         <div style="display:flex;flex-direction:column;gap:10px">
           <button class="btn primary" onclick="navigate('pendingUsers')"><i data-lucide="user-check"></i> Emeza abiyandikishije (${pendingUsers})</button>
           <button class="btn ghost" onclick="navigate('contributionWindow')"><i data-lucide="calendar-clock"></i> Fungura igihe cyo kwishura</button>
@@ -752,8 +697,7 @@ PAGES.dashboard = () => {
   setTimeout(() => {
     const c = document.getElementById("chart1");
     if (!c) return;
-    new Chart(c, {
-      type: "line",
+    new Chart(c, { type: "line",
       data: { labels: ["Jan","Feb","Mar","Apr","May","Jun"],
         datasets: [
           { label: "Yinjiye", data: [12000,15000,18000,22000,25000,30000], borderColor: "#16a34a", backgroundColor: "rgba(22,163,74,.1)", fill: true, tension: .4 },
@@ -764,33 +708,20 @@ PAGES.dashboard = () => {
   }, 100);
 };
 
-/* ==================== ADMIN: PENDING USERS ==================== */
 PAGES.pendingUsers = () => {
   const pending = DB.members.filter(m => m.status === "pending");
   $("#app").innerHTML = `
-    <div class="notice info">🆕 <strong>Abiyandikishije bategereje kwemezwa: ${pending.length}</strong></div>
-    ${pending.length ? `<div class="panel">
-      <div class="table-wrap"><table>
-        <thead><tr>
-          <th>Izina</th><th>Email</th><th>Telefoni</th><th>Koperative</th><th>Itariki</th><th>Actions</th>
-        </tr></thead>
-        <tbody>${pending.map(m => `<tr>
-          <td>${m.name}</td>
-          <td>${m.email || '-'}</td>
-          <td>${m.phone || '-'}</td>
-          <td>${m.coop || '-'}</td>
-          <td>${m.joined || '-'}</td>
-          <td>
-            <button class="btn primary" style="padding:8px 12px" onclick="approveUser('${m.id}')">
-              <i data-lucide="check"></i> Emeza
-            </button>
-            <button class="btn danger" style="padding:8px 12px" onclick="rejectUser('${m.id}')">
-              <i data-lucide="x"></i> Anga
-            </button>
-          </td>
-        </tr>`).join("")}</tbody>
-      </table></div>
-    </div>` : `<div class="panel"><div class="empty"><i data-lucide="user-check"></i><p>Nta busabe bushya 🎉</p></div></div>`}
+    <div class="notice info">🆕 <strong>Bategereje: ${pending.length}</strong></div>
+    ${pending.length ? `<div class="panel"><div class="table-wrap"><table>
+      <thead><tr><th>Izina</th><th>Email</th><th>Telefoni</th><th>Koperative</th><th>Itariki</th><th>Actions</th></tr></thead>
+      <tbody>${pending.map(m => `<tr>
+        <td>${m.name}</td><td>${m.email||'-'}</td><td>${m.phone||'-'}</td><td>${m.coop||'-'}</td><td>${m.joined||'-'}</td>
+        <td>
+          <button class="btn primary" style="padding:8px 12px" onclick="approveUser('${m.id}')"><i data-lucide="check"></i> Emeza</button>
+          <button class="btn danger" style="padding:8px 12px" onclick="rejectUser('${m.id}')"><i data-lucide="x"></i> Anga</button>
+        </td>
+      </tr>`).join("")}</tbody>
+    </table></div></div>` : `<div class="panel"><div class="empty"><i data-lucide="user-check"></i><p>Nta busabe bushya 🎉</p></div></div>`}
   `;
   icons();
 };
@@ -798,73 +729,64 @@ PAGES.pendingUsers = () => {
 window.approveUser = async (memberId) => {
   const m = DB.members.find(x => x.id === memberId);
   if (!m) return;
-  try {
-    const { db, doc, updateDoc, collection, addDoc } = window.FB;
-    await updateDoc(doc(db, "members", m.id), { status: "active" });
-    if (m.uid) await updateDoc(doc(db, "users", m.uid), { status: "approved" });
-    const i = DB.members.findIndex(x => x.id === memberId);
-    if (i >= 0) DB.members[i].status = "active";
-    await addDoc(collection(db, "notifications"), {
-      memberName: m.name,
-      title: "✅ Account yawe yemejwe",
-      body: "Ubu urashobora kwinjira muri sisitemu. Murakaza neza!",
-      type: "success",
-      date: today(),
-      read: false
-    });
-    toast(`✅ ${m.name} yemejwe!`);
-    navigate("pendingUsers");
-  } catch (e) {
-    console.error(e);
-    toast("Habaye ikibazo. Ongera ugerageze.", true);
+  
+  m.status = "active";
+  const u = DB.users.find(u => u.uid === m.uid || u.email === m.email);
+  if (u) u.status = "approved";
+  
+  DB.notifications.push({
+    id: uid(), memberName: m.name, title: "✅ Account yawe yemejwe",
+    body: "Ubu urashobora kwinjira muri sisitemu.", type: "success", date: today(), read: false
+  });
+  
+  saveLocal();
+  if (isFirebaseReady && m.uid) {
+    try {
+      await db.collection("members").doc(m.id).update({ status: "active" });
+      await db.collection("users").doc(m.uid).update({ status: "approved" });
+    } catch(e){}
   }
+  
+  toast(`✅ ${m.name} yemejwe!`); navigate("pendingUsers");
 };
 
 window.rejectUser = async (memberId) => {
   const m = DB.members.find(x => x.id === memberId);
   if (!m) return;
-  const reason = prompt("Impamvu yo kwanga (member azayibona):");
+  const reason = prompt("Impamvu yo kwanga:");
   if (!reason) return;
-  try {
-    const { db, doc, updateDoc, collection, addDoc } = window.FB;
-    await updateDoc(doc(db, "members", m.id), { status: "rejected", rejectReason: reason });
-    if (m.uid) await updateDoc(doc(db, "users", m.uid), { status: "rejected" });
-    const i = DB.members.findIndex(x => x.id === memberId);
-    if (i >= 0) { DB.members[i].status = "rejected"; DB.members[i].rejectReason = reason; }
-    await addDoc(collection(db, "notifications"), {
-      memberName: m.name,
-      title: "❌ Account yawe yanzwe",
-      body: `Impamvu: ${reason}. Vugana na Admin.`,
-      type: "danger",
-      date: today(),
-      read: false
-    });
-    toast(`❌ ${m.name} yanzwe.`);
-    navigate("pendingUsers");
-  } catch (e) {
-    console.error(e);
-    toast("Habaye ikibazo", true);
+  
+  m.status = "rejected"; m.rejectReason = reason;
+  const u = DB.users.find(u => u.uid === m.uid || u.email === m.email);
+  if (u) u.status = "rejected";
+  
+  DB.notifications.push({
+    id: uid(), memberName: m.name, title: "❌ Account yawe yanzwe",
+    body: `Impamvu: ${reason}.`, type: "danger", date: today(), read: false
+  });
+  
+  saveLocal();
+  if (isFirebaseReady && m.uid) {
+    try {
+      await db.collection("members").doc(m.id).update({ status: "rejected", rejectReason: reason });
+      await db.collection("users").doc(m.uid).update({ status: "rejected" });
+    } catch(e){}
   }
+  
+  toast(`❌ ${m.name} yanzwe.`); navigate("pendingUsers");
 };
 
-/* ==================== ADMIN: COOPS ==================== */
 PAGES.coops = () => {
   const list = DB.coops;
   $("#app").innerHTML = `
-    <div class="notice info">🏦 Buri koperative ifite <strong>account</strong> muri sisitemu.</div>
-    <div class="toolbar">
-      <div class="toolbar-l"></div>
-      <div class="toolbar-r"><button class="btn primary" onclick="openCoopForm()"><i data-lucide="plus"></i> Ongeraho koperative</button></div>
-    </div>
+    <div class="notice info">🏦 Buri koperative ifite account.</div>
+    <div class="toolbar"><div class="toolbar-l"></div><div class="toolbar-r">
+      <button class="btn primary" onclick="openCoopForm()"><i data-lucide="plus"></i> Ongeraho koperative</button></div></div>
     ${list.map(c => `
       <div class="coop-card">
         <div class="coop-card-head">
-          <div><h3>${c.name}</h3><small style="color:var(--muted)">${c.code} • ${c.location}</small></div>
+          <div><h3>${c.name}</h3><small style="color:var(--muted)">${c.code||''} • ${c.location||''}</small></div>
           <span class="badge-info">Balance: ${fmt(c.balance || 0)}</span>
-        </div>
-        <div class="coop-stats">
-          <div><small>Abanyamuryango</small><strong>${DB.members.filter(m => m.coop === c.name && m.status === 'active').length}</strong></div>
-          <div><small>Imisanzu</small><strong>${fmt(DB.contribs.filter(x => x.coop === c.name && x.status === 'confirmed').reduce((s,x) => s + +x.amount, 0))}</strong></div>
         </div>
         <div style="display:flex;gap:8px;flex-wrap:wrap">
           <button class="btn ghost" onclick="openCoopForm('${c.id}')"><i data-lucide="edit"></i> Hindura</button>
@@ -872,8 +794,7 @@ PAGES.coops = () => {
           <button class="btn ghost" onclick="openAddBalance('${c.id}')"><i data-lucide="plus-circle"></i> Ongeraho</button>
           <button class="btn danger" onclick="delCoop('${c.id}')"><i data-lucide="trash-2"></i> Siba</button>
         </div>
-      </div>
-    `).join("") || '<div class="empty"><i data-lucide="building-2"></i><p>Nta makoperative</p></div>'}
+      </div>`).join("") || '<div class="empty"><i data-lucide="building-2"></i><p>Nta makoperative</p></div>'}
   `;
   icons();
 };
@@ -889,28 +810,23 @@ window.openCoopForm = (id) => {
     </div>
     <div class="row">
       <div class="field"><label>Itariki</label><input type="date" class="input" id="f4" value="${c?.founded || ''}"></div>
-      <div class="field"><label>Balance (RWF)</label><input type="number" class="input" id="f5" value="${c?.balance || 0}"></div>
+      <div class="field"><label>Balance</label><input type="number" class="input" id="f5" value="${c?.balance || 0}"></div>
     </div>
     <div class="modal-actions">
       <button class="btn ghost" onclick="closeModal()">Hagarika</button>
       <button class="btn primary" onclick="saveCoop('${id || ''}')">Bika</button>
-    </div>
-  `);
+    </div>`);
 };
 window.saveCoop = (id) => {
   const n = $("#f1").value.trim();
   if (!n) return toast("Izina ni ngombwa", true);
   const o = { name: n, code: $("#f2").value, location: $("#f3").value, founded: $("#f4").value };
-  if (id) {
-    const i = DB.coops.findIndex(x => x.id === id);
-    DB.coops[i] = { ...DB.coops[i], ...o };
-  } else {
-    DB.coops.push({ id: uid(), ...o, balance: +$("#f5").value || 0, contributionWindow: null });
-  }
-  closeModal(); toast("Byabitswe"); scheduleSave(); navigate("coops");
+  if (id) { const i = DB.coops.findIndex(x => x.id === id); DB.coops[i] = { ...DB.coops[i], ...o }; }
+  else DB.coops.push({ id: uid(), ...o, balance: +$("#f5").value || 0, contributionWindow: null });
+  closeModal(); toast("✅ Byabitswe"); scheduleSave(); navigate("coops");
 };
 window.delCoop = (id) => {
-  if (!confirm("Uremeza gusiba iyi koperative?")) return;
+  if (!confirm("Uremeza gusiba?")) return;
   DB.coops = DB.coops.filter(x => x.id !== id);
   toast("Byasibwe"); scheduleSave(); navigate("coops");
 };
@@ -918,45 +834,32 @@ window.openAddBalance = (id) => {
   const c = DB.coops.find(x => x.id === id);
   if (!c) return;
   openModal(`
-    <h3>Ongeraho amafaranga kuri ${c.name}</h3>
-    <div class="notice info">Ubu balance: <strong>${fmt(c.balance || 0)}</strong></div>
+    <h3>Ongeraho kuri ${c.name}</h3>
     <div class="field"><label>Amafaranga</label><input type="number" class="input" id="abAmount"></div>
     <div class="field"><label>Ibisobanuro</label><input class="input" id="abDesc"></div>
     <div class="modal-actions">
       <button class="btn ghost" onclick="closeModal()">Hagarika</button>
       <button class="btn primary" onclick="saveAddBalance('${c.id}')">Ongeraho</button>
-    </div>
-  `);
+    </div>`);
 };
 window.saveAddBalance = (id) => {
   const c = DB.coops.find(x => x.id === id);
   const a = +$("#abAmount").value;
-  const desc = $("#abDesc").value.trim() || "Ongeraho";
   if (!a || a <= 0) return toast("Amafaranga si nziza", true);
   c.balance = (c.balance || 0) + a;
-  DB.tx.push({ id: uid(), desc, type: "income", cat: "Koperative", amount: a, date: today(), by: SESSION.name, ref: "T-" + Date.now() });
+  DB.tx.push({ id: uid(), desc: $("#abDesc").value.trim() || "Ongeraho", type: "income", cat: "Koperative", amount: a, date: today(), by: SESSION.name });
   closeModal(); toast("Byongeweho"); scheduleSave(); navigate("coops");
 };
 
-/* ==================== ADMIN: CONTRIBUTION WINDOW ==================== */
 PAGES.contributionWindow = () => {
   $("#app").innerHTML = `
-    <div class="notice info">📅 <strong>Shyiraho igihe cyo kwishura.</strong></div>
+    <div class="notice info">📅 Shyiraho igihe cyo kwishura.</div>
     ${DB.coops.map(c => `
       <div class="coop-card">
-        <div class="coop-card-head">
-          <div><h3>${c.name}</h3></div>
-          ${c.contributionWindow ? '<span class="status confirmed">Kiragfunguye</span>' : '<span class="status pending">Nta gihe</span>'}
-        </div>
-        ${c.contributionWindow ? `<div class="coop-stats">
-          <div><small>Icyiciro</small><strong>${c.contributionWindow.label}</strong></div>
-          <div><small>${c.contributionWindow.start} → ${c.contributionWindow.end}</small></div>
-          <div><small>Amafaranga</small><strong>${fmt(c.contributionWindow.amountPerMember)}</strong></div>
-        </div>` : ''}
+        <div class="coop-card-head"><div><h3>${c.name}</h3></div>
+          ${c.contributionWindow ? '<span class="status confirmed">Kiragfunguye</span>' : '<span class="status pending">Nta gihe</span>'}</div>
         <button class="btn primary" onclick="openWindowForm('${c.id}')"><i data-lucide="calendar-plus"></i> ${c.contributionWindow ? "Hindura" : "Fungura"}</button>
-      </div>
-    `).join("")}
-  `;
+      </div>`).join("")}`;
   icons();
 };
 
@@ -974,162 +877,92 @@ window.openWindowForm = (coopId) => {
     <div class="modal-actions">
       <button class="btn ghost" onclick="closeModal()">Hagarika</button>
       <button class="btn primary" onclick="saveWindow('${c.id}')">Bika</button>
-    </div>
-  `);
+    </div>`);
 };
-
 window.saveWindow = (coopId) => {
   const c = DB.coops.find(x => x.id === coopId);
-  const start = $("#wStart").value;
-  const end = $("#wEnd").value;
-  const amount = +$("#wAmount").value;
+  const start = $("#wStart").value, end = $("#wEnd").value, amount = +$("#wAmount").value;
   const label = $("#wLabel").value.trim() || "Umusanzu";
   if (!start || !end || !amount) return toast("Uzuza ibisabwa", true);
   if (end < start) return toast("Itariki ntihura", true);
   c.contributionWindow = { start, end, amountPerMember: amount, label };
+  
   DB.members.filter(m => m.coop === c.name && m.status === "active").forEach(m => {
-    addNotification(m.name, "📅 Igihe cyo kwishura cyafungutse",
-      `${label} — ${fmt(amount)}. Igihe: ${start} → ${end}.`, "info");
+    DB.notifications.push({ id: uid(), memberName: m.name, title: "📅 Igihe cyo kwishura", body: `${label} — ${fmt(amount)}. ${start} → ${end}.`, type: "info", date: today(), read: false });
   });
+  
   closeModal(); toast("✅ Byabitswe"); scheduleSave(); navigate("contributionWindow");
 };
 
-/* ==================== ADMIN: PENDING PAYMENTS ==================== */
 PAGES.pendingPayments = () => {
   const pending = DB.payments.filter(p => p.status === "pending");
   $("#app").innerHTML = `
-    <div class="notice info">🛡️ <strong>Bitegereje: ${pending.length}</strong></div>
-    ${pending.length ? `<div class="panel">
-      <div class="table-wrap"><table>
-        <thead><tr><th>Umunyamuryango</th><th>Amafaranga</th><th>Uburyo</th><th>Ref</th><th>Itariki</th><th>Action</th></tr></thead>
-        <tbody>${pending.map(p => `<tr>
-          <td>${p.member}</td><td><strong>${fmt(p.amount)}</strong></td><td>${p.method}</td>
-          <td><span class="pwd-cell">${p.ref}</span></td><td>${p.date}</td>
-          <td><button class="btn primary" style="padding:8px 14px" onclick="acceptPayment('${p.id}')"><i data-lucide="check"></i> Emeza</button></td>
-        </tr>`).join("")}</tbody>
-      </table></div>
-    </div>` : `<div class="panel"><div class="empty"><i data-lucide="check-circle"></i><p>Nta bwishyu butegereje 🎉</p></div></div>`}
-  `;
+    <div class="notice info">🛡️ Bitegereje: ${pending.length}</div>
+    ${pending.length ? `<div class="panel"><div class="table-wrap"><table>
+      <thead><tr><th>Umunyamuryango</th><th>Amafaranga</th><th>Uburyo</th><th>Ref</th><th>Itariki</th><th>Action</th></tr></thead>
+      <tbody>${pending.map(p => `<tr>
+        <td>${p.member}</td><td><strong>${fmt(p.amount)}</strong></td><td>${p.method}</td>
+        <td><span class="pwd-cell">${p.ref}</span></td><td>${p.date}</td>
+        <td><button class="btn primary" style="padding:8px 14px" onclick="acceptPayment('${p.id}')"><i data-lucide="check"></i> Emeza</button></td>
+      </tr>`).join("")}</tbody></table></div></div>` :
+      `<div class="panel"><div class="empty"><i data-lucide="check-circle"></i><p>Nta bwishyu butegereje</p></div></div>`}`;
   icons();
 };
 
 window.acceptPayment = (id) => {
   const p = DB.payments.find(x => x.id === id);
   if (!p) return;
-  const info = DB.members.find(m => m.name === p.member) || {};
-  const coop = DB.coops.find(c => c.name === (info.coop || p.coop));
   openModal(`
     <h3>✅ Emeza ubwishyu</h3>
-    <div class="notice info">
-      <strong>${p.member}</strong> yishyuye <strong>${fmt(p.amount)}</strong> (${p.method}, Ref: ${p.ref}).
-    </div>
+    <div class="notice info"><strong>${p.member}</strong> yishyuye <strong>${fmt(p.amount)}</strong> (${p.method}, ${p.ref}).</div>
     <div class="modal-actions">
       <button class="btn ghost" onclick="closeModal()">Hagarika</button>
       <button class="btn primary" onclick="finalAcceptPayment('${p.id}')">Emeza</button>
-    </div>
-  `);
+    </div>`);
 };
-
 window.finalAcceptPayment = (id) => {
   const p = DB.payments.find(x => x.id === id);
   if (!p) return;
   const info = DB.members.find(m => m.name === p.member) || {};
   const coop = DB.coops.find(c => c.name === (info.coop || p.coop));
   p.status = "confirmed";
-  DB.contribs.push({
-    id: uid(), member: p.member, coop: info.coop || p.coop || "",
-    amount: p.amount, date: p.date, method: p.method, ref: p.ref,
-    status: "confirmed", submittedBy: "member"
-  });
-  DB.tx.push({
-    id: uid(), desc: `Umusanzu wa ${p.member}`, type: "income",
-    cat: "Imisanzu", amount: p.amount, date: today(), by: SESSION.name, ref: p.ref
-  });
+  DB.contribs.push({ id: uid(), member: p.member, coop: info.coop || p.coop || "", amount: p.amount, date: p.date, method: p.method, ref: p.ref, status: "confirmed" });
+  DB.tx.push({ id: uid(), desc: `Umusanzu wa ${p.member}`, type: "income", cat: "Imisanzu", amount: p.amount, date: today(), by: SESSION.name, ref: p.ref });
   if (coop) coop.balance = (coop.balance || 0) + p.amount;
-  addNotification(p.member, "✅ Ubwishyu bwemejwe", `${fmt(p.amount)} yinjiye.`, "success");
+  DB.notifications.push({ id: uid(), memberName: p.member, title: "✅ Ubwishyu bwemejwe", body: `${fmt(p.amount)} yinjiye.`, type: "success", date: today(), read: false });
+  
   closeModal(); toast("✅ Byemejwe!"); scheduleSave(); navigate("pendingPayments");
 };
 
-/* ==================== ADMIN: LOANS ==================== */
 PAGES.adminLoans = () => {
   const pending = DB.loans.filter(l => l.status === "pending");
-  const approved = DB.loans.filter(l => l.status === "approved");
   $("#app").innerHTML = `
-    <div class="notice info">🏦 <strong>Inguzanyo zitegereje: ${pending.length}</strong> — shyiraho inyungu igihe wemeza.</div>
-    ${pending.length ? `<div class="panel">
-      <div class="table-wrap"><table>
-        <thead><tr><th>Umunyamuryango</th><th>Amafaranga</th><th>Impamvu</th><th>Igihe</th><th>Actions</th></tr></thead>
-        <tbody>${pending.map(l => `<tr>
-          <td>${l.member}</td><td><strong>${fmt(l.amount)}</strong></td>
-          <td>${l.purpose}</td><td>${l.duration} amezi</td>
-          <td>
-            <button class="btn primary" style="padding:8px 12px" onclick="approveLoan('${l.id}')"><i data-lucide="check"></i> Emeza</button>
-            <button class="btn danger" style="padding:8px 12px" onclick="rejectLoanForm('${l.id}')"><i data-lucide="x"></i> Anga</button>
-          </td>
-        </tr>`).join("")}</tbody>
-      </table></div>
-    </div>` : `<div class="panel"><div class="empty"><i data-lucide="check-circle"></i><p>Nta nguzanyo itegereje</p></div></div>`}
-    ${approved.length ? `<div class="panel">
-      <div class="panel-head"><h2>Zemejwe (${approved.length})</h2></div>
-      <div class="table-wrap"><table>
-        <thead><tr><th>Umunyamuryango</th><th>Amafaranga</th><th>Inyungu</th><th>Yose</th><th>Itariki</th></tr></thead>
-        <tbody>${approved.map(l => {
-          const interest = Math.round(l.amount * (l.interestRate || 0) / 100);
-          return `<tr>
-            <td>${l.member}</td><td>${fmt(l.amount)}</td>
-            <td>${l.interestRate}%</td><td><strong>${fmt(l.amount + interest)}</strong></td>
-            <td>${l.approvedAt}</td>
-          </tr>`;
-        }).join("")}</tbody>
-      </table></div>
-    </div>` : ''}
-  `;
+    <div class="notice info">🏦 Zitegereje: ${pending.length}</div>
+    ${pending.length ? `<div class="panel"><div class="table-wrap"><table>
+      <thead><tr><th>Umunyamuryango</th><th>Amafaranga</th><th>Impamvu</th><th>Igihe</th><th>Actions</th></tr></thead>
+      <tbody>${pending.map(l => `<tr>
+        <td>${l.member}</td><td><strong>${fmt(l.amount)}</strong></td><td>${l.purpose}</td><td>${l.duration} amezi</td>
+        <td>
+          <button class="btn primary" style="padding:8px 12px" onclick="approveLoan('${l.id}')"><i data-lucide="check"></i> Emeza</button>
+          <button class="btn danger" style="padding:8px 12px" onclick="rejectLoanForm('${l.id}')"><i data-lucide="x"></i> Anga</button>
+        </td></tr>`).join("")}</tbody></table></div></div>` :
+      `<div class="panel"><div class="empty"><i data-lucide="check-circle"></i><p>Nta nguzanyo itegereje</p></div></div>`}`;
   icons();
 };
 
 window.approveLoan = (id) => {
   const l = DB.loans.find(x => x.id === id);
   if (!l) return;
-  const info = DB.members.find(m => m.name === l.member) || {};
-  const coop = DB.coops.find(c => c.name === (info.coop || l.coop));
   openModal(`
-    <h3>✅ Emeza inguzanyo — shyiraho inyungu</h3>
-    <div class="notice info">
-      <strong>${l.member}</strong> asaba <strong>${fmt(l.amount)}</strong> (${l.duration} amezi).<br>
-      Impamvu: ${l.purpose}
-    </div>
-    ${coop ? `<div class="notice ${coop.balance >= l.amount ? 'success' : 'danger'}">
-      Balance ya ${coop.name}: <strong>${fmt(coop.balance || 0)}</strong>
-      ${coop.balance >= l.amount ? '' : ' — ⚠️ Ntihagije!'}
-    </div>` : ''}
-    <div class="field"><label>🔑 Inyungu (%) — wowe ushyiraho</label>
-      <input type="number" class="input" id="apRate" value="5" min="0" max="100" step="0.5" />
-    </div>
-    <div class="field"><label>Itariki yo kwishyura</label>
-      <input type="date" class="input" id="apDue" value="${addMonths(today(), l.duration)}" />
-    </div>
-    <div class="notice info" id="calcPreview"></div>
+    <h3>✅ Emeza inguzanyo</h3>
+    <div class="notice info"><strong>${l.member}</strong> asaba <strong>${fmt(l.amount)}</strong> (${l.duration} amezi).</div>
+    <div class="field"><label>Inyungu (%)</label><input type="number" class="input" id="apRate" value="5" min="0" step="0.5"></div>
+    <div class="field"><label>Itariki yo kwishyura</label><input type="date" class="input" id="apDue" value="${addMonths(today(), l.duration)}"></div>
     <div class="modal-actions">
       <button class="btn ghost" onclick="closeModal()">Hagarika</button>
       <button class="btn primary" onclick="finalApproveLoan('${l.id}')">Emeza</button>
-    </div>
-  `);
-  setTimeout(() => {
-    const inp = $("#apRate");
-    if (inp) {
-      const update = () => {
-        const r = +inp.value || 0;
-        const interest = Math.round(l.amount * r / 100);
-        $("#calcPreview").innerHTML = `
-          💰 ${fmt(l.amount)} + 📈 ${fmt(interest)} (${r}%) = <strong>${fmt(l.amount + interest)}</strong>
-        `;
-      };
-      inp.addEventListener("input", update);
-      update();
-    }
-  }, 50);
+    </div>`);
 };
-
 window.finalApproveLoan = (id) => {
   const l = DB.loans.find(x => x.id === id);
   if (!l) return;
@@ -1139,55 +972,41 @@ window.finalApproveLoan = (id) => {
   const due = $("#apDue").value;
   if (rate < 0) return toast("Inyungu si nziza", true);
   if (coop && coop.balance < l.amount) return toast("Balance ntihagije", true);
-  l.status = "approved";
-  l.approvedAt = today();
-  l.approvedBy = SESSION.name;
-  l.interestRate = rate;
-  l.dueDate = due;
+  l.status = "approved"; l.approvedAt = today(); l.approvedBy = SESSION.name;
+  l.interestRate = rate; l.dueDate = due;
   if (coop) coop.balance = (coop.balance || 0) - l.amount;
-  DB.tx.push({
-    id: uid(), desc: `Inguzanyo kuri ${l.member}`, type: "expense",
-    cat: "Inguzanyo", amount: l.amount, date: today(), by: SESSION.name, ref: "L-" + l.id
-  });
-  const interest = Math.round(l.amount * rate / 100);
-  addNotification(l.member, "✅ Inguzanyo yemejwe",
-    `${fmt(l.amount)} yemejwe. Inyungu: ${rate}%. Yose: ${fmt(l.amount + interest)}. Due: ${due}`, "success");
-  closeModal(); toast(`✅ Inguzanyo yemejwe. Inyungu: ${rate}%`); scheduleSave(); navigate("adminLoans");
+  DB.tx.push({ id: uid(), desc: `Inguzanyo kuri ${l.member}`, type: "expense", cat: "Inguzanyo", amount: l.amount, date: today(), by: SESSION.name });
+  DB.notifications.push({ id: uid(), memberName: l.member, title: "✅ Inguzanyo yemejwe", body: `${fmt(l.amount)} • Inyungu: ${rate}%`, type: "success", date: today(), read: false });
+  
+  closeModal(); toast("✅ Yemejwe"); scheduleSave(); navigate("adminLoans");
 };
-
 window.rejectLoanForm = (id) => {
   const l = DB.loans.find(x => x.id === id);
   if (!l) return;
   openModal(`
     <h3>❌ Anga ubusabe</h3>
-    <div class="field">
-      <label>Impamvu</label>
+    <div class="field"><label>Impamvu</label>
       <select class="input" id="rjReason">
         <option value="">— Hitamo —</option>
         <option>Koperative nta mafaranga</option>
         <option>Amafaranga ni menshi</option>
         <option>Ubusabe ntibwuzuye</option>
-        <option>Afitе inguzanyo itarishyuwe</option>
       </select>
     </div>
     <div class="modal-actions">
       <button class="btn ghost" onclick="closeModal()">Hagarika</button>
       <button class="btn danger" onclick="finalRejectLoan('${l.id}')">Anga</button>
-    </div>
-  `);
+    </div>`);
 };
-
 window.finalRejectLoan = (id) => {
   const reason = $("#rjReason").value;
   if (!reason) return toast("Hitamo impamvu", true);
   const l = DB.loans.find(x => x.id === id);
-  l.status = "rejected";
-  l.rejectReason = reason;
-  addNotification(l.member, "❌ Inguzanyo yanzwe", `Impamvu: ${reason}`, "danger");
+  l.status = "rejected"; l.rejectReason = reason;
+  DB.notifications.push({ id: uid(), memberName: l.member, title: "❌ Inguzanyo yanzwe", body: `Impamvu: ${reason}`, type: "danger", date: today(), read: false });
   closeModal(); toast("Yanzwe"); scheduleSave(); navigate("adminLoans");
 };
 
-/* ==================== ADMIN: MEMBERS ==================== */
 PAGES.members = () => {
   const list = DB.members.filter(m => m.status !== "pending");
   $("#app").innerHTML = `
@@ -1203,10 +1022,8 @@ PAGES.members = () => {
         <td>
           <button class="act" onclick="openMemberForm('${m.id}')"><i data-lucide="edit"></i></button>
           <button class="act del" onclick="delMember('${m.id}')"><i data-lucide="trash-2"></i></button>
-        </td>
-      </tr>`).join("") || `<tr><td colspan="6" class="empty">Nta banyamuryango</td></tr>`}</tbody>
-    </table></div></div>
-  `;
+        </td></tr>`).join("") || `<tr><td colspan="6" class="empty">Nta banyamuryango</td></tr>`}</tbody>
+    </table></div></div>`;
   $("#s").oninput = e => {
     const q = e.target.value.toLowerCase();
     $$("#tb tr").forEach(r => r.style.display = r.textContent.toLowerCase().includes(q) ? "" : "none");
@@ -1224,22 +1041,18 @@ window.openMemberForm = (id) => {
     </div>
     <div class="field"><label>Email</label><input type="email" class="input" id="fEmail" value="${m?.email || ''}"></div>
     <div class="field"><label>Koperative</label>
-      <select class="input" id="f4">${DB.coops.map(c => `<option ${m?.coop === c.name ? 'selected' : ''}>${c.name}</option>`).join("")}</select>
-    </div>
+      <select class="input" id="f4">${DB.coops.map(c => `<option ${m?.coop === c.name ? 'selected' : ''}>${c.name}</option>`).join("")}</select></div>
     <div class="row">
       <div class="field"><label>Itariki</label><input type="date" class="input" id="f5" value="${m?.joined || today()}"></div>
-      <div class="field"><label>Status</label>
-        <select class="input" id="f6">
-          <option value="active" ${m?.status === 'active' ? 'selected' : ''}>Arakora</option>
-          <option value="inactive" ${m?.status === 'inactive' ? 'selected' : ''}>Ntakora</option>
-        </select>
-      </div>
+      <div class="field"><label>Status</label><select class="input" id="f6">
+        <option value="active" ${m?.status === 'active' ? 'selected' : ''}>Arakora</option>
+        <option value="inactive" ${m?.status === 'inactive' ? 'selected' : ''}>Ntakora</option>
+      </select></div>
     </div>
     <div class="modal-actions">
       <button class="btn ghost" onclick="closeModal()">Hagarika</button>
       <button class="btn primary" onclick="saveMember('${id || ''}')">Bika</button>
-    </div>
-  `);
+    </div>`);
 };
 window.saveMember = (id) => {
   const n = $("#f1").value.trim();
@@ -1255,43 +1068,27 @@ window.delMember = (id) => {
   toast("Byasibwe"); scheduleSave(); navigate("members");
 };
 
-/* ==================== ADMIN: OTHER ==================== */
 PAGES.contribs = () => {
-  $("#app").innerHTML = `
-    <div class="panel"><div class="table-wrap"><table>
-      <thead><tr><th>Umunyamuryango</th><th>Amafaranga</th><th>Itariki</th><th>Status</th></tr></thead>
-      <tbody>${DB.contribs.slice().reverse().map(c => `<tr>
-        <td>${c.member}</td><td>${fmt(c.amount)}</td><td>${c.date}</td>
-        <td><span class="status ${c.status}">${c.status === 'pending' ? 'Bitegereje' : 'Byemejwe'}</span></td>
-      </tr>`).join("") || `<tr><td colspan="4" class="empty">Nta misanzu</td></tr>`}</tbody>
-    </table></div></div>
-  `;
+  $("#app").innerHTML = `<div class="panel"><div class="table-wrap"><table>
+    <thead><tr><th>Umunyamuryango</th><th>Amafaranga</th><th>Itariki</th><th>Status</th></tr></thead>
+    <tbody>${DB.contribs.slice().reverse().map(c => `<tr><td>${c.member}</td><td>${fmt(c.amount)}</td><td>${c.date}</td>
+      <td><span class="status ${c.status}">${c.status === 'pending' ? 'Bitegereje' : 'Byemejwe'}</span></td></tr>`).join("") || `<tr><td colspan="4" class="empty">Nta misanzu</td></tr>`}</tbody>
+  </table></div></div>`;
 };
-
 PAGES.shares = () => {
-  $("#app").innerHTML = `
-    <div class="panel"><div class="table-wrap"><table>
-      <thead><tr><th>Umunyamuryango</th><th>Amafaranga</th><th>Itariki</th></tr></thead>
-      <tbody>${DB.shares.slice().reverse().map(s => `<tr>
-        <td>${s.member}</td><td>${fmt(s.amount)}</td><td>${s.date}</td>
-      </tr>`).join("") || `<tr><td colspan="3" class="empty">Nta migabane</td></tr>`}</tbody>
-    </table></div></div>
-  `;
+  $("#app").innerHTML = `<div class="panel"><div class="table-wrap"><table>
+    <thead><tr><th>Umunyamuryango</th><th>Amafaranga</th><th>Itariki</th></tr></thead>
+    <tbody>${DB.shares.slice().reverse().map(s => `<tr><td>${s.member}</td><td>${fmt(s.amount)}</td><td>${s.date}</td></tr>`).join("") || `<tr><td colspan="3" class="empty">Nta migabane</td></tr>`}</tbody>
+  </table></div></div>`;
 };
-
 PAGES.payments = () => {
-  $("#app").innerHTML = `
-    <div class="panel"><div class="table-wrap"><table>
-      <thead><tr><th>Umunyamuryango</th><th>Amafaranga</th><th>Itariki</th><th>Ref</th><th>Status</th></tr></thead>
-      <tbody>${DB.payments.slice().reverse().map(p => `<tr>
-        <td>${p.member}</td><td>${fmt(p.amount)}</td><td>${p.date}</td>
-        <td><span class="pwd-cell">${p.ref}</span></td>
-        <td><span class="status ${p.status}">${p.status === 'pending' ? 'Bitegereje' : 'Byemejwe'}</span></td>
-      </tr>`).join("") || `<tr><td colspan="5" class="empty">Nta bwishyu</td></tr>`}</tbody>
-    </table></div></div>
-  `;
+  $("#app").innerHTML = `<div class="panel"><div class="table-wrap"><table>
+    <thead><tr><th>Umunyamuryango</th><th>Amafaranga</th><th>Itariki</th><th>Ref</th><th>Status</th></tr></thead>
+    <tbody>${DB.payments.slice().reverse().map(p => `<tr><td>${p.member}</td><td>${fmt(p.amount)}</td><td>${p.date}</td>
+      <td><span class="pwd-cell">${p.ref}</span></td>
+      <td><span class="status ${p.status}">${p.status === 'pending' ? 'Bitegereje' : 'Byemejwe'}</span></td></tr>`).join("") || `<tr><td colspan="5" class="empty">Nta bwishyu</td></tr>`}</tbody>
+  </table></div></div>`;
 };
-
 PAGES.finance = () => {
   const inc = DB.tx.filter(x => x.type === "income").reduce((s,x) => s + +x.amount, 0);
   const exp = DB.tx.filter(x => x.type === "expense").reduce((s,x) => s + +x.amount, 0);
@@ -1303,23 +1100,17 @@ PAGES.finance = () => {
     </div>
     <div class="panel"><div class="table-wrap"><table>
       <thead><tr><th>Ibisobanuro</th><th>Amafaranga</th><th>Ubwoko</th><th>Itariki</th></tr></thead>
-      <tbody>${DB.tx.slice().reverse().map(t => `<tr>
-        <td>${t.desc}</td><td>${fmt(t.amount)}</td>
+      <tbody>${DB.tx.slice().reverse().map(t => `<tr><td>${t.desc}</td><td>${fmt(t.amount)}</td>
         <td><span class="status ${t.type === 'income' ? 'confirmed' : 'rejected'}">${t.type === 'income' ? 'Yinjiye' : 'Yasohotse'}</span></td>
-        <td>${t.date}</td>
-      </tr>`).join("") || `<tr><td colspan="4" class="empty">Nta bikorwa</td></tr>`}</tbody>
-    </table></div></div>
-  `;
+        <td>${t.date}</td></tr>`).join("") || `<tr><td colspan="4" class="empty">Nta bikorwa</td></tr>`}</tbody>
+    </table></div></div>`;
 };
-
 PAGES.announce = () => {
   $("#app").innerHTML = `
     <div class="toolbar"><div class="toolbar-r"><button class="btn primary" onclick="openAnnForm()"><i data-lucide="megaphone"></i> Tangaza</button></div></div>
-    ${DB.ann.map(a => `<div class="panel"><strong>${a.title}</strong><p style="font-size:13px;color:#666;margin-top:6px">${a.body}</p><small>${a.date}</small></div>`).join("") || '<div class="empty"><p>Nta butumwa</p></div>'}
-  `;
+    ${DB.ann.map(a => `<div class="panel"><strong>${a.title}</strong><p style="font-size:13px;color:#666;margin-top:6px">${a.body}</p><small>${a.date}</small></div>`).join("") || '<div class="empty"><p>Nta butumwa</p></div>'}`;
   icons();
 };
-
 window.openAnnForm = () => {
   openModal(`
     <h3>Ubutumwa Bushya</h3>
@@ -1328,25 +1119,24 @@ window.openAnnForm = () => {
     <div class="modal-actions">
       <button class="btn ghost" onclick="closeModal()">Hagarika</button>
       <button class="btn primary" onclick="saveAnn()">Tangaza</button>
-    </div>
-  `);
+    </div>`);
 };
 window.saveAnn = () => {
   const t = $("#f1").value.trim(), b = $("#f2").value.trim();
   if (!t || !b) return toast("Uzuza ibisabwa", true);
   DB.ann.unshift({ id: uid(), title: t, body: b, date: today() });
-  addNotification("ALL", `📢 ${t}`, b, "info");
+  DB.notifications.push({ id: uid(), memberName: "ALL", title: `📢 ${t}`, body: b, type: "info", date: today(), read: false });
   closeModal(); toast("Byatangajwe"); scheduleSave(); navigate("announce");
 };
-
 PAGES.settings = () => {
   $("#app").innerHTML = `
     <div class="notice info">👤 Uri kwinjira nka <strong>Admin</strong> — ${SESSION.email}</div>
-    <div class="panel">
-      <div class="panel-head"><h2>Sohoka</h2></div>
-      <button class="btn danger" onclick="logout()"><i data-lucide="log-out"></i> Sohoka</button>
-    </div>
-  `;
+    <div class="panel"><div class="panel-head"><h2>Gusiba amakuru yose (Reset)</h2></div>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:10px">Ibi bizasiba amakuru yose ari muri LocalStorage n'umukoresha.</p>
+      <button class="btn danger" onclick="localStorage.clear(); location.reload();"><i data-lucide="trash"></i> Siba byose</button></div>
+    <div class="panel"><div class="panel-head"><h2>Sohoka</h2></div>
+      <button class="btn danger" onclick="logout()"><i data-lucide="log-out"></i> Sohoka</button></div>`;
+  icons();
 };
 
 /* ==================== MEMBER PAGES ==================== */
@@ -1357,7 +1147,6 @@ function getTimeStatus(w) {
   if (t >= w.start && t <= w.end) return "open";
   return "closed";
 }
-
 PAGES.myDashboard = () => {
   const me = SESSION.memberName;
   const info = DB.members.find(m => m.name === me) || {};
@@ -1370,61 +1159,45 @@ PAGES.myDashboard = () => {
   const approvedLoans = myLoans.filter(l => l.status === "approved");
   const totalC = myC.filter(x => x.status === "confirmed").reduce((s,x) => s + +x.amount, 0);
   const totalS = myS.reduce((s,x) => s + +x.amount, 0);
-  const totalOwed = approvedLoans.reduce((s,l) => {
-    const interest = Math.round(l.amount * (l.interestRate || 0) / 100);
-    return s + l.amount + interest;
-  }, 0);
-  const stat = (ic, cl, lbl, val) => `
-    <div class="stat"><div class="stat-icon ${cl}"><i data-lucide="${ic}"></i></div>
-      <div class="stat-info"><small>${lbl}</small><strong>${val}</strong></div></div>`;
+  const totalOwed = approvedLoans.reduce((s,l) => s + l.amount + Math.round(l.amount * (l.interestRate || 0) / 100), 0);
+  const stat = (ic, cl, lbl, val) => `<div class="stat"><div class="stat-icon ${cl}"><i data-lucide="${ic}"></i></div>
+    <div class="stat-info"><small>${lbl}</small><strong>${val}</strong></div></div>`;
   $("#app").innerHTML = `
     <div class="panel" style="background:linear-gradient(135deg,#15803d,#166534);color:#fff;border:none">
       <h2>Murakaza neza, ${me}!</h2>
       <p style="opacity:.9">${info.coop || ""} — ${info.no || ""}</p>
-      ${coop ? `<p style="opacity:.85;font-size:12px;margin-top:6px">💰 Balance ya koperative: <strong>${fmt(coop.balance || 0)}</strong></p>` : ''}
+      ${coop ? `<p style="opacity:.85;font-size:12px;margin-top:6px">💰 Balance: <strong>${fmt(coop.balance || 0)}</strong></p>` : ''}
     </div>
-    ${w ? (getTimeStatus(w) === "open" ? `<div class="notice success">📅 Igihe cyo kwishura kiragfunguye! ${w.label} — ${fmt(w.amountPerMember)}</div>` : '') : ''}
+    ${w && getTimeStatus(w) === "open" ? `<div class="notice success">📅 Igihe cyo kwishura kiragfunguye! ${w.label} — ${fmt(w.amountPerMember)}</div>` : ''}
     <div class="stats">
       ${stat("hand-coins", "g", "Imisanzu", fmt(totalC))}
       ${stat("pie-chart", "b", "Imigabane", fmt(totalS))}
       ${stat("clock", "o", "Butegereje", myP.filter(x => x.status === "pending").length)}
       ${stat("banknote", "b", "Inguzanyo", fmt(totalOwed))}
-    </div>
-  `;
+    </div>`;
   icons();
 };
-
 PAGES.myPayContribution = () => {
   const me = SESSION.memberName;
   const info = DB.members.find(m => m.name === me) || {};
   const coop = DB.coops.find(c => c.name === info.coop);
   const w = coop?.contributionWindow;
   $("#app").innerHTML = `
-    <div class="panel">
-      <div class="panel-head"><h2>Ishyura umusanzu</h2></div>
+    <div class="panel"><div class="panel-head"><h2>Ishyura umusanzu</h2></div>
       ${w ? `<div style="background:#f8fafc;padding:14px;border-radius:10px;margin-bottom:16px">
-        <strong>${w.label}</strong><br><small>${w.start} → ${w.end} • ${fmt(w.amountPerMember)}</small>
-      </div>` : ''}
+        <strong>${w.label}</strong><br><small>${w.start} → ${w.end} • ${fmt(w.amountPerMember)}</small></div>` : ''}
       <div class="field"><label>Amafaranga</label><input type="number" class="input" id="pmAmount" value="${w ? w.amountPerMember : ''}"></div>
       <div class="row">
-        <div class="field"><label>Uburyo</label>
-          <select class="input" id="pmMethod">
-            <option value="MoMo">MTN MoMo</option>
-            <option value="Airtel">Airtel Money</option>
-            <option value="Cash">Cash</option>
-          </select>
-        </div>
+        <div class="field"><label>Uburyo</label><select class="input" id="pmMethod">
+          <option value="MoMo">MTN MoMo</option><option value="Airtel">Airtel Money</option><option value="Cash">Cash</option>
+        </select></div>
         <div class="field"><label>Ref</label><input class="input" id="pmRef" placeholder="MP240101..."></div>
       </div>
       <div class="field"><label>Itariki</label><input type="date" class="input" id="pmDate" value="${today()}"></div>
-      <button class="btn primary big" onclick="submitMyPayment()" style="width:100%;justify-content:center">
-        <i data-lucide="send"></i> Ohereza
-      </button>
-    </div>
-  `;
+      <button class="btn primary big" onclick="submitMyPayment()" style="width:100%;justify-content:center"><i data-lucide="send"></i> Ohereza</button>
+    </div>`;
   icons();
 };
-
 window.submitMyPayment = () => {
   const amount = +$("#pmAmount").value;
   const method = $("#pmMethod").value;
@@ -1434,48 +1207,33 @@ window.submitMyPayment = () => {
   if (DB.payments.some(p => p.ref === ref && p.status !== "rejected")) return toast("Iyi Ref isanzweho", true);
   const me = SESSION.memberName;
   const info = DB.members.find(m => m.name === me) || {};
-  DB.payments.push({
-    id: uid(), member: me, memberId: info.id, coop: info.coop || "",
-    amount, date: $("#pmDate").value, method, ref, status: "pending"
-  });
-  addNotification("ALL", "💰 Ubwishyu bushya", `${me} yishyuye ${fmt(amount)} (${method}).`, "warn");
+  DB.payments.push({ id: uid(), member: me, memberId: info.id, coop: info.coop || "", amount, date: $("#pmDate").value, method, ref, status: "pending" });
+  DB.notifications.push({ id: uid(), memberName: "ALL", title: "💰 Ubwishyu bushya", body: `${me} yishyuye ${fmt(amount)}.`, type: "warn", date: today(), read: false });
   toast("✅ Bwoherejwe!"); scheduleSave(); navigate("myPayContribution");
 };
-
 PAGES.myLoans = () => {
   const me = SESSION.memberName;
   const myLoans = DB.loans.filter(l => l.member === me).slice().reverse();
   $("#app").innerHTML = `
-    <div class="notice info">🏦 Saba inguzanyo. Admin azashyiraho inyungu.</div>
-    <div class="panel">
-      <div class="panel-head"><h2>Saba inguzanyo</h2></div>
+    <div class="notice info">🏦 Saba inguzanyo.</div>
+    <div class="panel"><div class="panel-head"><h2>Saba inguzanyo</h2></div>
       <div class="field"><label>Amafaranga</label><input type="number" class="input" id="lnAmount"></div>
       <div class="field"><label>Impamvu</label><textarea class="input" id="lnPurpose" rows="2"></textarea></div>
-      <div class="field"><label>Igihe</label>
-        <select class="input" id="lnDuration">
-          <option value="3">3 amezi</option>
-          <option value="6" selected>6 amezi</option>
-          <option value="12">12 amezi</option>
-          <option value="24">24 amezi</option>
-        </select>
-      </div>
+      <div class="field"><label>Igihe</label><select class="input" id="lnDuration">
+        <option value="3">3 amezi</option><option value="6" selected>6 amezi</option>
+        <option value="12">12 amezi</option><option value="24">24 amezi</option>
+      </select></div>
       <button class="btn primary big" onclick="submitLoanRequest()" style="width:100%;justify-content:center"><i data-lucide="send"></i> Ohereza</button>
     </div>
-    <div class="panel">
-      <div class="panel-head"><h2>Amateka</h2></div>
+    <div class="panel"><div class="panel-head"><h2>Amateka</h2></div>
       <div class="table-wrap"><table>
         <thead><tr><th>Amafaranga</th><th>Igihe</th><th>Inyungu</th><th>Status</th></tr></thead>
-        <tbody>${myLoans.map(l => `<tr>
-          <td>${fmt(l.amount)}</td><td>${l.duration} amezi</td>
+        <tbody>${myLoans.map(l => `<tr><td>${fmt(l.amount)}</td><td>${l.duration} amezi</td>
           <td>${l.interestRate != null ? l.interestRate + '%' : '—'}</td>
-          <td><span class="status ${l.status === 'approved' ? 'confirmed' : l.status === 'rejected' ? 'rejected' : 'pending'}">${l.status}</span></td>
-        </tr>`).join("") || `<tr><td colspan="4" class="empty">Nta nguzanyo</td></tr>`}</tbody>
-      </table></div>
-    </div>
-  `;
+          <td><span class="status ${l.status === 'approved' ? 'confirmed' : l.status === 'rejected' ? 'rejected' : 'pending'}">${l.status}</span></td></tr>`).join("") || `<tr><td colspan="4" class="empty">Nta nguzanyo</td></tr>`}</tbody>
+      </table></div></div>`;
   icons();
 };
-
 window.submitLoanRequest = () => {
   const amount = +$("#lnAmount").value;
   const purpose = $("#lnPurpose").value.trim();
@@ -1485,57 +1243,34 @@ window.submitLoanRequest = () => {
   const me = SESSION.memberName;
   const info = DB.members.find(m => m.name === me) || {};
   if (DB.loans.some(l => l.member === me && l.status === "pending")) return toast("Ufite ubusabe butegereje", true);
-  DB.loans.push({
-    id: uid(), member: me, memberId: info.id, coop: info.coop || "",
-    amount, purpose, duration, interestRate: null,
-    requestedAt: today(), status: "pending",
-    approvedAt: null, approvedBy: null, rejectReason: null, dueDate: null
-  });
-  addNotification("ALL", "🏦 Ubusabe bw'inguzanyo", `${me} asaba ${fmt(amount)} (${duration} amezi).`, "warn");
+  DB.loans.push({ id: uid(), member: me, memberId: info.id, coop: info.coop || "", amount, purpose, duration, interestRate: null, requestedAt: today(), status: "pending", approvedAt: null, approvedBy: null, rejectReason: null, dueDate: null });
+  DB.notifications.push({ id: uid(), memberName: "ALL", title: "🏦 Ubusabe bw'inguzanyo", body: `${me} asaba ${fmt(amount)}.`, type: "warn", date: today(), read: false });
   toast("✅ Bwoherejwe!"); scheduleSave(); navigate("myLoans");
 };
-
 PAGES.myNotif = () => {
   const list = getMyNotifications();
   $("#app").innerHTML = `
     <div class="notice info">🔔 ${list.filter(n => !n.read).length} bushya</div>
-    ${list.map(n => `<div class="notif-card ${n.type}"><strong>${n.title}</strong><p>${n.body}</p><small>${n.date}</small></div>`).join("") || '<div class="empty"><p>Nta butumwa</p></div>'}
-  `;
-  list.forEach(n => n.read = true);
-  scheduleSave();
-  updateNotifDot();
+    ${list.map(n => `<div class="notif-card ${n.type}"><strong>${n.title}</strong><p>${n.body}</p><small>${n.date}</small></div>`).join("") || '<div class="empty"><p>Nta butumwa</p></div>'}`;
+  list.forEach(n => n.read = true); scheduleSave(); updateNotifDot();
 };
-
 PAGES.myProfile = () => {
   const m = DB.members.find(x => x.name === SESSION.memberName) || {};
-  $("#app").innerHTML = `
-    <div class="panel">
-      <div class="panel-head"><h2>Umwirondoro</h2></div>
-      <div class="row">
-        <div class="field"><label>Izina</label><input class="input" value="${m.name || ''}" disabled></div>
-        <div class="field"><label>Nimero</label><input class="input" value="${m.no || ''}" disabled></div>
-      </div>
-      <div class="row">
-        <div class="field"><label>Koperative</label><input class="input" value="${m.coop || ''}" disabled></div>
-        <div class="field"><label>Email</label><input class="input" value="${SESSION.email}" disabled></div>
-      </div>
-    </div>
-  `;
+  $("#app").innerHTML = `<div class="panel"><div class="panel-head"><h2>Umwirondoro</h2></div>
+    <div class="row"><div class="field"><label>Izina</label><input class="input" value="${m.name || ''}" disabled></div>
+      <div class="field"><label>Nimero</label><input class="input" value="${m.no || ''}" disabled></div></div>
+    <div class="row"><div class="field"><label>Koperative</label><input class="input" value="${m.coop || ''}" disabled></div>
+      <div class="field"><label>Email</label><input class="input" value="${SESSION.email}" disabled></div></div>
+  </div>`;
 };
-
 PAGES.myContribs = () => {
   const list = DB.contribs.filter(c => c.member === SESSION.memberName);
-  $("#app").innerHTML = `
-    <div class="panel"><div class="table-wrap"><table>
-      <thead><tr><th>Amafaranga</th><th>Itariki</th><th>Status</th></tr></thead>
-      <tbody>${list.map(c => `<tr>
-        <td>${fmt(c.amount)}</td><td>${c.date}</td>
-        <td><span class="status ${c.status}">${c.status === 'pending' ? 'Bitegereje' : 'Byemejwe'}</span></td>
-      </tr>`).join("") || `<tr><td colspan="3" class="empty">Nta misanzu</td></tr>`}</tbody>
-    </table></div></div>
-  `;
+  $("#app").innerHTML = `<div class="panel"><div class="table-wrap"><table>
+    <thead><tr><th>Amafaranga</th><th>Itariki</th><th>Status</th></tr></thead>
+    <tbody>${list.map(c => `<tr><td>${fmt(c.amount)}</td><td>${c.date}</td>
+      <td><span class="status ${c.status}">${c.status === 'pending' ? 'Bitegereje' : 'Byemejwe'}</span></td></tr>`).join("") || `<tr><td colspan="3" class="empty">Nta misanzu</td></tr>`}</tbody>
+  </table></div></div>`;
 };
-
 PAGES.myShares = () => {
   const list = DB.shares.filter(c => c.member === SESSION.memberName);
   $("#app").innerHTML = `<div class="panel"><div class="table-wrap"><table>
@@ -1543,35 +1278,25 @@ PAGES.myShares = () => {
     <tbody>${list.map(c => `<tr><td>${fmt(c.amount)}</td><td>${c.date}</td></tr>`).join("") || `<tr><td colspan="2" class="empty">Nta migabane</td></tr>`}</tbody>
   </table></div></div>`;
 };
-
 PAGES.myPayments = () => {
   const list = DB.payments.filter(c => c.member === SESSION.memberName).slice().reverse();
   $("#app").innerHTML = `<div class="panel"><div class="table-wrap"><table>
     <thead><tr><th>Amafaranga</th><th>Itariki</th><th>Ref</th><th>Status</th></tr></thead>
     <tbody>${list.map(p => `<tr><td>${fmt(p.amount)}</td><td>${p.date}</td><td>${p.ref}</td>
-      <td><span class="status ${p.status}">${p.status === 'pending' ? 'Bitegereje' : 'Byemejwe'}</span></td>
-    </tr>`).join("") || `<tr><td colspan="4" class="empty">Nta bwishyu</td></tr>`}</tbody>
+      <td><span class="status ${p.status}">${p.status === 'pending' ? 'Bitegereje' : 'Byemejwe'}</span></td></tr>`).join("") || `<tr><td colspan="4" class="empty">Nta bwishyu</td></tr>`}</tbody>
   </table></div></div>`;
 };
-
 PAGES.myAnnounce = () => {
   $("#app").innerHTML = DB.ann.map(a => `<div class="panel"><strong>${a.title}</strong><p>${a.body}</p><small>${a.date}</small></div>`).join("") || '<div class="empty"><p>Nta butumwa</p></div>';
 };
-
 PAGES.mySettings = () => {
   $("#app").innerHTML = `
     <div class="notice info">👤 Uri kwinjira nka <strong>${SESSION.name}</strong> — ${SESSION.email}</div>
-    <div class="panel">
-      <div class="panel-head"><h2>🔑 Hindura Password</h2></div>
-      <p style="font-size:13px;color:var(--muted);margin-bottom:12px">
-        Koresha Firebase Console cyangwa vugana na Admin kugira ngo uhindure password yawe.
-      </p>
-    </div>
-    <div class="panel">
-      <div class="panel-head"><h2>Sohoka</h2></div>
-      <button class="btn danger" onclick="logout()"><i data-lucide="log-out"></i> Sohoka</button>
-    </div>
-  `;
+    <div class="panel"><div class="panel-head"><h2>🔑 Hindura Password</h2></div>
+      <p style="font-size:13px;color:var(--muted)">Vugana na Admin niba ushaka guhindura password.</p></div>
+    <div class="panel"><div class="panel-head"><h2>Sohoka</h2></div>
+      <button class="btn danger" onclick="logout()"><i data-lucide="log-out"></i> Sohoka</button></div>`;
+  icons();
 };
 
 function render(page) {
@@ -1579,8 +1304,57 @@ function render(page) {
   icons();
 }
 
-icons();
-</script>
+/* ============================================================
+   ⚡ WIRE BUTTONS (Iyi ni yo nzira y'umutekano)
+   ============================================================ */
+function wireLoginButtons() {
+  const lb = document.getElementById("loginBtn");
+  const sb = document.getElementById("signupBtn");
+  
+  if (lb) {
+    lb.onclick = null;
+    lb.addEventListener("click", (e) => {
+      e.preventDefault();
+      doLogin();
+    });
+  }
+  if (sb) {
+    sb.onclick = null;
+    sb.addEventListener("click", (e) => {
+      e.preventDefault();
+      doSignup();
+    });
+  }
+}
 
+// Tangiza sisitemu
+loadLocal();
+wireLoginButtons();
+icons();
+
+// Kora Admin wa mbere niba atabaho
+if (DB.users.length === 0) {
+  DB.users.push({
+    uid: "admin-001",
+    email: "admin@coopconnect.rw",
+    password: "admin123",
+    name: "Admin Mukuru",
+    role: "admin",
+    status: "approved",
+    memberName: null
+  });
+  saveLocal();
+  console.log("✅ Admin wa mbere yashyizweho: admin@coopconnect.rw | admin123");
+}
+
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Enter" && !document.getElementById("loginScreen").classList.contains("hidden")) {
+    if (document.activeElement && ["loginPass","loginId"].includes(document.activeElement.id)) {
+      doLogin();
+    }
+  }
+});
+
+</script>
 </body>
 </html>
