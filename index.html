@@ -293,9 +293,11 @@ function el(tag, attrs = {}, ...children) {
   Object.entries(attrs).forEach(([k, v]) => {
     if (k === "className") node.className = v;
     else if (k === "style" && typeof v === "object") Object.assign(node.style, v);
-    else if (k.startsWith("on") && typeof v === "function") node.addEventListener(k.slice(2).toLowerCase(), v); // YAKOSOWE: toLowerCase()
+    else if (k.startsWith("on") && typeof v === "function") node.addEventListener(k.slice(2).toLowerCase(), v);
     else if (k === "dataset") Object.assign(node.dataset, v);
-    else if (v !== undefined && v !== null) node.setAttribute(k, v);
+    else if (v === false || v === null || v === undefined) return; // FIXED: drop false/null/undefined
+    else if (v === true) node.setAttribute(k, "");
+    else node.setAttribute(k, v);
   });
   children.forEach(c => {
     if (c == null) return;
@@ -578,10 +580,11 @@ function bindRegisterButton() {
 
       try { await updateProfile(user, { displayName: fullName }); } catch (e) { console.warn("updateProfile:", e); }
 
+      // FIXED: Shyizemo cooperativeId "coop-001" aho kuba null
       await setDoc(doc(db, "profiles", user.uid), {
         uid: user.uid, fullName, email, phone,
         role: role === "employee" ? "employee" : "member",
-        status: "pending", cooperativeId: null,
+        status: "pending", cooperativeId: "coop-001",
         createdAt: serverTimestamp()
       });
 
@@ -783,12 +786,31 @@ async function navigate(viewId) {
 // ============================================================
 // DATA HELPERS
 // ============================================================
+// FIXED: Iyi function ubu ishyira cooperativeId muri query
 async function fetchCollection(name, conditions = []) {
   let q = collection(db, name);
-  conditions.forEach(c => { q = query(q, where(c.field, c.op, c.value)); });
+  
+  // Dufata cooperativeId y'umukoresha
+  const userCoopId = state.cooperativeId; 
+
+  // Niba ari collection isaba cooperativeId (uretse profiles)
+  if (name !== "profiles" && name !== "cooperatives") {
+    if (userCoopId) {
+      q = query(q, where("cooperativeId", "==", userCoopId));
+    } else {
+      console.warn(`[Fetch] cooperativeId ni null kuri "${name}".`);
+    }
+  }
+
+  // Ongeraho andi mabwiriza (nka status == 'pending')
+  conditions.forEach(c => { 
+    q = query(q, where(c.field, c.op, c.value)); 
+  });
+
   const snap = await getDocs(q);
   return snap.docs.map(d => ({ id: d.id, ...d.data() }));
 }
+
 function formatDate(ts) {
   if (!ts) return "—";
   let d;
@@ -796,7 +818,7 @@ function formatDate(ts) {
   else if (ts instanceof Date) d = ts;
   else if (typeof ts === "number") d = new Date(ts);
   else return String(ts);
-  return d.toLocaleDateString("en-RW", { year: "numeric", month: "short", day: "numeric" });
+  return d.toLocaleDateString("en-GB", { year: "numeric", month: "short", day: "numeric" });
 }
 function formatCurrency(a, c = "RWF") { if (a == null || isNaN(a)) return `${c} 0`; return `${c} ${Number(a).toLocaleString()}`; }
 function statCard(label, value, icon) {
@@ -813,7 +835,7 @@ function aggregateByMonth(items) {
   items.forEach(it => {
     const ts = it.createdAt || it.date; if (!ts) return;
     let d; if (ts.toDate) d = ts.toDate(); else if (typeof ts === "number") d = new Date(ts); else if (ts instanceof Date) d = ts; else return;
-    const key = d.toLocaleDateString("en-RW", { year: "numeric", month: "short" });
+    const key = d.toLocaleDateString("en-GB", { year: "numeric", month: "short" });
     map[key] = (map[key] || 0) + (Number(it.amount) || 0);
   });
   const labels = Object.keys(map);
@@ -830,9 +852,10 @@ function formGroup(label, id, type = "text", required = false, value = "", readO
 // USERS (APPROVALS)
 // ============================================================
 async function renderUsers(container) {
-  const pendingUsers = await fetchCollection("profiles", [{ field: "status", op: "==", value: "pending" }]);
   const allUsers = await fetchCollection("profiles");
+  // Kugarura gusa abandi bakoresha (tutareba uwo uriho)
   const otherUsers = allUsers.filter(u => u.uid !== state.user.uid);
+  const pendingUsers = otherUsers.filter(u => u.status === "pending");
 
   if (otherUsers.length === 0) {
     container.appendChild(el("div", { className: "card empty-state" }, el("i", { className: "fas fa-users" }), el("p", {}, "No other users found.")));
@@ -896,12 +919,11 @@ async function renderDashboard(c) {
 }
 
 async function renderAdminDashboard(container) {
-  const coopId = state.cooperativeId;
   const [members, loans, transactions, contributions] = await Promise.all([
-    fetchCollection("cooperative_members", coopId ? [{ field: "cooperativeId", op: "==", value: coopId }] : []),
-    fetchCollection("loan_applications", coopId ? [{ field: "cooperativeId", op: "==", value: coopId }] : []),
-    fetchCollection("transactions", coopId ? [{ field: "cooperativeId", op: "==", value: coopId }] : []),
-    fetchCollection("share_contributions", coopId ? [{ field: "cooperativeId", op: "==", value: coopId }] : [])
+    fetchCollection("cooperative_members"),
+    fetchCollection("loan_applications"),
+    fetchCollection("transactions"),
+    fetchCollection("share_contributions")
   ]);
   const totalMembers = members.length;
   const activeMembers = members.filter(m => (m.status || m.membershipStatus) === "active").length;
@@ -992,11 +1014,10 @@ async function renderAdminDashboard(container) {
 }
 
 async function renderEmployeeDashboard(container) {
-  const coopId = state.cooperativeId;
   const [announcements, activities, members] = await Promise.all([
-    fetchCollection("announcements", coopId ? [{ field: "cooperativeId", op: "==", value: coopId }] : []),
-    fetchCollection("activities", coopId ? [{ field: "cooperativeId", op: "==", value: coopId }] : []),
-    fetchCollection("cooperative_members", coopId ? [{ field: "cooperativeId", op: "==", value: coopId }] : [])
+    fetchCollection("announcements"),
+    fetchCollection("activities"),
+    fetchCollection("cooperative_members")
   ]);
   container.appendChild(el("div", { className: "grid grid-3 mb-3" },
     statCard("Cooperative Members", members.length, "fa-users"),
@@ -1033,12 +1054,12 @@ async function renderEmployeeDashboard(container) {
 }
 
 async function renderMemberDashboard(container) {
-  const uid = state.user.uid; const coopId = state.cooperativeId;
+  const uid = state.user.uid;
   const [myContrib, myLoans, myTx, ann] = await Promise.all([
-    fetchCollection("share_contributions", [{ field: "memberId", op: "==", value: uid }, ...(coopId ? [{ field: "cooperativeId", op: "==", value: coopId }] : [])]),
-    fetchCollection("loan_applications", [{ field: "memberId", op: "==", value: uid }, ...(coopId ? [{ field: "cooperativeId", op: "==", value: coopId }] : [])]),
-    fetchCollection("transactions", [{ field: "userId", op: "==", value: uid }, ...(coopId ? [{ field: "cooperativeId", op: "==", value: coopId }] : [])]),
-    fetchCollection("announcements", coopId ? [{ field: "cooperativeId", op: "==", value: coopId }] : [])
+    fetchCollection("share_contributions", [{ field: "memberId", op: "==", value: uid }]),
+    fetchCollection("loan_applications", [{ field: "memberId", op: "==", value: uid }]),
+    fetchCollection("transactions", [{ field: "userId", op: "==", value: uid }]),
+    fetchCollection("announcements")
   ]);
   const totalShares = myContrib.filter(c => c.status === "confirmed").reduce((s, c) => s + (Number(c.amount) || 0), 0);
   const pendingLoans = myLoans.filter(l => l.status === "pending" || l.status === "under_review").length;
@@ -1097,8 +1118,7 @@ async function renderMemberDashboard(container) {
 // MEMBERS
 // ============================================================
 async function renderMembers(container) {
-  const coopId = state.cooperativeId;
-  const members = await fetchCollection("cooperative_members", coopId ? [{ field: "cooperativeId", op: "==", value: coopId }] : []);
+  const members = await fetchCollection("cooperative_members");
 
   container.appendChild(el("div", { className: "search-bar" },
     el("input", { type: "text", className: "form-control", placeholder: "Search members...", id: "member-search" }),
@@ -1175,7 +1195,7 @@ async function renderMembers(container) {
         try {
           showLoading(true);
           await addDoc(collection(db, "cooperative_members"), {
-            cooperativeId: coopId, fullName, memberNumber, phone, email,
+            cooperativeId: state.cooperativeId, fullName, memberNumber, phone, email,
             district: $("#member-district").value.trim(),
             membershipDate: $("#member-date").value || null,
             status: $("#member-status").value,
@@ -1234,8 +1254,7 @@ async function renderMembers(container) {
 // EMPLOYEES
 // ============================================================
 async function renderEmployees(container) {
-  const coopId = state.cooperativeId;
-  const employees = await fetchCollection("employees", coopId ? [{ field: "cooperativeId", op: "==", value: coopId }] : []);
+  const employees = await fetchCollection("employees");
   container.appendChild(el("div", { className: "search-bar" },
     el("button", { className: "btn btn-primary", id: "add-employee-btn" }, el("i", { className: "fas fa-plus" }), "Add Employee")
   ));
@@ -1262,7 +1281,7 @@ async function renderEmployees(container) {
         try {
           showLoading(true);
           await addDoc(collection(db, "employees"), {
-            cooperativeId: coopId, fullName: $("#emp-fullName").value.trim(),
+            cooperativeId: state.cooperativeId, fullName: $("#emp-fullName").value.trim(),
             email: $("#emp-email").value.trim(), role: "employee", status: "active",
             createdAt: serverTimestamp()
           });
@@ -1281,8 +1300,7 @@ async function renderEmployees(container) {
 // SHARES
 // ============================================================
 async function renderShares(container) {
-  const coopId = state.cooperativeId;
-  const contributions = await fetchCollection("share_contributions", coopId ? [{ field: "cooperativeId", op: "==", value: coopId }] : []);
+  const contributions = await fetchCollection("share_contributions");
   container.appendChild(el("div", { className: "grid grid-3 mb-3" },
     statCard("Total Confirmed", contributions.filter(c => c.status === "confirmed").reduce((s, c) => s + (Number(c.amount) || 0), 0).toLocaleString(), "fa-check-circle"),
     statCard("Pending", contributions.filter(c => c.status === "pending").length, "fa-clock"),
@@ -1311,8 +1329,7 @@ async function renderShares(container) {
 // LOANS
 // ============================================================
 async function renderLoans(container) {
-  const coopId = state.cooperativeId;
-  const loans = await fetchCollection("loan_applications", coopId ? [{ field: "cooperativeId", op: "==", value: coopId }] : []);
+  const loans = await fetchCollection("loan_applications");
   container.appendChild(el("div", { className: "grid grid-3 mb-3" },
     statCard("Pending", loans.filter(l => l.status === "pending" || l.status === "under_review").length, "fa-clock"),
     statCard("Approved", loans.filter(l => l.status === "approved" || l.status === "disbursed").length, "fa-check-circle"),
@@ -1361,8 +1378,7 @@ async function renderLoans(container) {
 // TRANSACTIONS
 // ============================================================
 async function renderTransactions(container) {
-  const coopId = state.cooperativeId;
-  const tx = await fetchCollection("transactions", coopId ? [{ field: "cooperativeId", op: "==", value: coopId }] : []);
+  const tx = await fetchCollection("transactions");
   const income = tx.filter(t => t.type === "income" || t.category === "income").reduce((s, t) => s + (Number(t.amount) || 0), 0);
   const expenses = tx.filter(t => t.type === "expense" || t.category === "expense").reduce((s, t) => s + (Number(t.amount) || 0), 0);
   container.appendChild(el("div", { className: "grid grid-3 mb-3" },
@@ -1392,8 +1408,7 @@ async function renderTransactions(container) {
 // ANNOUNCEMENTS
 // ============================================================
 async function renderAnnouncements(container) {
-  const coopId = state.cooperativeId;
-  const ann = await fetchCollection("announcements", coopId ? [{ field: "cooperativeId", op: "==", value: coopId }] : []);
+  const ann = await fetchCollection("announcements");
   if (state.role === "admin") {
     container.appendChild(el("div", { className: "search-bar" },
       el("button", { className: "btn btn-primary", id: "add-announcement-btn" }, el("i", { className: "fas fa-plus" }), "New Announcement")
@@ -1412,7 +1427,7 @@ async function renderAnnouncements(container) {
           try {
             showLoading(true);
             await addDoc(collection(db, "announcements"), {
-              cooperativeId: coopId, title, content,
+              cooperativeId: state.cooperativeId, title, content,
               authorId: state.user.uid, authorName: state.profile?.fullName || "Admin",
               createdAt: serverTimestamp(), status: "published"
             });
@@ -1448,12 +1463,11 @@ async function renderAnnouncements(container) {
 // REPORTS
 // ============================================================
 async function renderReports(container) {
-  const coopId = state.cooperativeId;
   const [members, contributions, loans, tx] = await Promise.all([
-    fetchCollection("cooperative_members", coopId ? [{ field: "cooperativeId", op: "==", value: coopId }] : []),
-    fetchCollection("share_contributions", coopId ? [{ field: "cooperativeId", op: "==", value: coopId }] : []),
-    fetchCollection("loan_applications", coopId ? [{ field: "cooperativeId", op: "==", value: coopId }] : []),
-    fetchCollection("transactions", coopId ? [{ field: "cooperativeId", op: "==", value: coopId }] : [])
+    fetchCollection("cooperative_members"),
+    fetchCollection("share_contributions"),
+    fetchCollection("loan_applications"),
+    fetchCollection("transactions")
   ]);
   const reports = [
     { title: "Members Report", count: members.length, icon: "fa-users", data: members, filename: "members.csv" },
@@ -1482,7 +1496,9 @@ function exportCSV(data, filename) {
     let v = obj[k];
     if (v && typeof v === "object" && v.toDate) v = v.toDate().toISOString();
     if (v && typeof v === "object") v = JSON.stringify(v);
-    return `"${String(v ?? "").replace(/"/g, '""')}"`;
+    let str = String(v ?? "");
+    if (/^[=+\-@]/.test(str)) str = "'" + str; // FIXED: Prevent CSV Injection
+    return `"${str.replace(/"/g, '""')}"`;
   }).join(","));
   const csv = [header, ...rows].join("\n");
   const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
