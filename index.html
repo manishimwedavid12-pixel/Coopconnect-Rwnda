@@ -293,7 +293,7 @@ function el(tag, attrs = {}, ...children) {
   Object.entries(attrs).forEach(([k, v]) => {
     if (k === "className") node.className = v;
     else if (k === "style" && typeof v === "object") Object.assign(node.style, v);
-    else if (k.startsWith("on") && typeof v === "function") node.addEventListener(k.slice(2), v);
+    else if (k.startsWith("on") && typeof v === "function") node.addEventListener(k.slice(2).toLowerCase(), v); // YAKOSOWE: toLowerCase()
     else if (k === "dataset") Object.assign(node.dataset, v);
     else if (v !== undefined && v !== null) node.setAttribute(k, v);
   });
@@ -317,6 +317,7 @@ function showToast(message, type = "info", duration = 4000) {
   setTimeout(() => {
     toast.style.opacity = "0";
     toast.style.transform = "translateX(100%)";
+    toast.style.transition = "all .3s ease";
     setTimeout(() => toast.remove(), 300);
   }, duration);
 }
@@ -332,6 +333,7 @@ function showLoading(show) {
 }
 
 function openModal(title, contentNode, onClose) {
+  document.getElementById("modal-backdrop")?.remove();
   const backdrop = el("div", { className: "modal-backdrop", id: "modal-backdrop" });
   const modal = el("div", { className: "modal" });
   modal.appendChild(el("div", { className: "modal-header" },
@@ -349,8 +351,22 @@ function confirmDialog(title, message, onConfirm) {
   const content = el("div", {},
     el("p", { className: "mb-2" }, message),
     el("div", { className: "flex gap-1 justify-between mt-2" },
-      el("button", { className: "btn btn-outline", onClick: () => $("#modal-backdrop")?.remove() }, "Cancel"),
-      el("button", { className: "btn btn-danger", onClick: () => { $("#modal-backdrop")?.remove(); onConfirm(); } }, "Confirm")
+      el("button", {
+        className: "btn btn-outline",
+        onClick: () => document.getElementById("modal-backdrop")?.remove()
+      }, "Cancel"),
+      el("button", {
+        className: "btn btn-danger",
+        onClick: async () => {
+          document.getElementById("modal-backdrop")?.remove();
+          try {
+            await onConfirm();
+          } catch (err) {
+            console.error("Confirm action failed:", err);
+            showToast("Action failed: " + (err.message || "Unknown error"), "error");
+          }
+        }
+      }, "Confirm")
     )
   );
   openModal(title, content);
@@ -598,6 +614,12 @@ function bindRegisterButton() {
 // AUTH STATE OBSERVER
 // ============================================================
 onAuthStateChanged(auth, async (user) => {
+  if (!user) {
+    document.getElementById("modal-backdrop")?.remove();
+    const loading = document.getElementById("loading-overlay");
+    if (loading) loading.remove();
+  }
+
   if (user) {
     state.user = user;
     showLoading(true);
@@ -648,10 +670,21 @@ onAuthStateChanged(auth, async (user) => {
   }
 });
 
+// ============================================================
+// LOGOUT BUTTON
+// ============================================================
 $("#logout-btn").addEventListener("click", () => {
   confirmDialog("Logout", "Are you sure you want to log out?", async () => {
-    try { await signOut(auth); showToast("Logged out.", "success"); }
-    catch (err) { showToast("Logout failed: " + err.message, "error"); }
+    try {
+      showLoading(true);
+      await signOut(auth);
+      showToast("Logged out successfully.", "success");
+      setTimeout(() => { window.location.reload(); }, 500);
+    } catch (err) {
+      console.error("Logout error:", err);
+      showToast("Logout failed: " + (err.message || "Unknown error"), "error");
+      showLoading(false);
+    }
   });
 });
 
@@ -854,7 +887,7 @@ async function renderUsers(container) {
 }
 
 // ============================================================
-// DASHBOARD & REMAINING CODE
+// DASHBOARD
 // ============================================================
 async function renderDashboard(c) {
   if (state.role === "admin") return renderAdminDashboard(c);
@@ -1149,7 +1182,7 @@ async function renderMembers(container) {
             createdAt: serverTimestamp(), createdBy: state.user.uid
           });
           showToast("Member added.", "success");
-          $("#modal-backdrop")?.remove();
+          document.getElementById("modal-backdrop")?.remove();
           navigate("members");
         } catch (err) { showToast("Failed: " + err.message, "error"); }
         finally { showLoading(false); }
@@ -1185,7 +1218,7 @@ async function renderMembers(container) {
             updatedAt: serverTimestamp(), updatedBy: state.user.uid
           });
           showToast("Member updated.", "success");
-          $("#modal-backdrop")?.remove();
+          document.getElementById("modal-backdrop")?.remove();
           navigate("members");
         } catch (err) { showToast("Failed: " + err.message, "error"); }
         finally { showLoading(false); }
@@ -1234,7 +1267,7 @@ async function renderEmployees(container) {
             createdAt: serverTimestamp()
           });
           showToast("Employee added.", "success");
-          $("#modal-backdrop")?.remove();
+          document.getElementById("modal-backdrop")?.remove();
           navigate("employees");
         } catch (err) { showToast("Failed: " + err.message, "error"); }
         finally { showLoading(false); }
@@ -1384,7 +1417,7 @@ async function renderAnnouncements(container) {
               createdAt: serverTimestamp(), status: "published"
             });
             showToast("Announcement published.", "success");
-            $("#modal-backdrop")?.remove();
+            document.getElementById("modal-backdrop")?.remove();
             navigate("announcements");
           } catch (err) { showToast("Failed: " + err.message, "error"); }
           finally { showLoading(false); }
@@ -1529,7 +1562,7 @@ async function renderMyLoans(container) {
             createdAt: serverTimestamp()
           });
           showToast("Loan application submitted.", "success");
-          $("#modal-backdrop")?.remove();
+          document.getElementById("modal-backdrop")?.remove();
           navigate("my-loans");
         } catch (err) { showToast("Failed: " + err.message, "error"); }
         finally { showLoading(false); }
@@ -1565,9 +1598,6 @@ async function renderMyTransactions(container) {
 function init() {
   bindLoginButton();
   bindRegisterButton();
-  if (firebaseConfig.apiKey === "AIzaSyA7OfUycQUBA39tZu_bRO3VHdE3m_gxp_Q") {
-    // Ntacyo gukora kuko config ari nyayo
-  }
 }
 
 init();
