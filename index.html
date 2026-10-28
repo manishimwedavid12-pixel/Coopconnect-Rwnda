@@ -1324,12 +1324,14 @@ async function renderMemberDashboard(container) {
   const pendingLoans = myLoans.filter(l => l.status === "pending" || l.status === "under_review").length;
   const approvedLoans = myLoans.filter(l => l.status === "approved" || l.status === "disbursed").length;
   
+  // HANO: Iyi ni Card yerekana konti ya banki na MoMo ya Cooperative
   if (state.coopSettings && state.coopSettings.coopBankAccount) {
     container.appendChild(el("div", { className: "card mb-3", style: { borderLeft: "5px solid var(--info)" } },
-      el("h4", { style: { color: "var(--info)", marginBottom: "10px" } }, "Konti ya Banki y'ikigo (Kwishyura)"),
+      el("h4", { style: { color: "var(--info)", marginBottom: "10px" } }, "Aho Wishyurira (Konti ya Cooperative)"),
       el("p", {}, el("strong", {}, "Bank Name: "), state.coopSettings.coopBankName || "Ntibirabura"),
       el("p", {}, el("strong", {}, "Account Number: "), state.coopSettings.coopBankAccount || "Ntibirabura"),
-      el("p", { className: "text-sm text-muted mt-1" }, "Ushobora kohereza amafaranga kuri iyi konti hanyuma ukandika nimero ya transaction mu kwishyura.")
+      el("p", {}, el("strong", {}, "MoMo Number: "), state.coopSettings.coopMomoNumber || "Ntibirabura"),
+      el("p", { className: "text-sm text-muted mt-1" }, "Ushobora kohereza amafaranga kuri iyi konti cyangwa kuri MoMo hanyuma ukandika nimero ya transaction mu kwishyura.")
     ));
   }
 
