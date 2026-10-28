@@ -183,6 +183,78 @@ tr:hover td{background:#f7faf7}
           <input type="tel" id="reg-phone" class="form-control" placeholder="+250 7XX XXX XXX" />
           <div id="reg-phone-error" class="error-text hidden"></div>
         </div>
+        
+        <div class="form-group">
+          <label for="reg-national-id">National ID (16 Digits)</label>
+          <input type="text" id="reg-national-id" class="form-control" placeholder="1199070012345678" maxlength="16" />
+          <div id="reg-national-id-error" class="error-text hidden"></div>
+        </div>
+
+        <!-- ================= ADDRESS DROPDOWNS ================= -->
+        <div class="form-group">
+          <label for="reg-province">Province (Intara)</label>
+          <select id="reg-province" class="form-control">
+            <option value="">Select Province</option>
+            <option value="Kigali City">Kigali City</option>
+            <option value="Northern Province">Northern Province</option>
+            <option value="Southern Province">Southern Province</option>
+            <option value="Eastern Province">Eastern Province</option>
+            <option value="Western Province">Western Province</option>
+          </select>
+          <div id="reg-province-error" class="error-text hidden"></div>
+        </div>
+
+        <div class="form-group">
+          <label for="reg-district">District (Akarere)</label>
+          <select id="reg-district" class="form-control" disabled>
+            <option value="">Select District</option>
+          </select>
+          <div id="reg-district-error" class="error-text hidden"></div>
+        </div>
+
+        <div class="form-group">
+          <label for="reg-sector">Sector (Umurenge)</label>
+          <select id="reg-sector" class="form-control" disabled>
+            <option value="">Select Sector</option>
+          </select>
+          <div id="reg-sector-error" class="error-text hidden"></div>
+        </div>
+
+        <div class="form-group">
+          <label for="reg-cell">Cell (Akagari)</label>
+          <input type="text" id="reg-cell" class="form-control" placeholder="Andika Akagari hano..." />
+          <div id="reg-cell-error" class="error-text hidden"></div>
+        </div>
+
+        <div class="form-group">
+          <label for="reg-village">Village (Umudugudu)</label>
+          <input type="text" id="reg-village" class="form-control" placeholder="Andika Umudugudu hano..." />
+          <div id="reg-village-error" class="error-text hidden"></div>
+        </div>
+        <!-- ================= ADDRESS DROPDOWNS END ================= -->
+
+        <!-- ================= BANK ACCOUNT INFO (MEMBER) ================= -->
+        <div class="divider">Konti ya Banki (Iyo wishyura)</div>
+        <div class="form-group">
+          <label for="reg-bank-name">Bank Name</label>
+          <select id="reg-bank-name" class="form-control">
+            <option value="">Select Bank</option>
+            <option value="Bank of Kigali">Bank of Kigali</option>
+            <option value="Equity Bank">Equity Bank</option>
+            <option value="I&M Bank">I&M Bank</option>
+            <option value="Ecobank">Ecobank</option>
+            <option value="BPR">BPR (Banque Populaire)</option>
+            <option value="Other">Other</option>
+          </select>
+          <div id="reg-bank-name-error" class="error-text hidden"></div>
+        </div>
+        <div class="form-group">
+          <label for="reg-bank-account">Bank Account Number</label>
+          <input type="text" id="reg-bank-account" class="form-control" placeholder="e.g. 000123456789" />
+          <div id="reg-bank-account-error" class="error-text hidden"></div>
+        </div>
+        <!-- ================= BANK ACCOUNT INFO END ================= -->
+
         <div class="form-group">
           <label for="reg-role">Register As</label>
           <select id="reg-role" class="form-control">
@@ -280,7 +352,7 @@ try {
   setTimeout(() => showToast("Firebase init failed. Check config.", "error", 8000), 500);
 }
 
-const state = { user: null, profile: null, role: null, cooperativeId: null, currentView: "dashboard", charts: {} };
+const state = { user: null, profile: null, role: null, cooperativeId: null, currentView: "dashboard", charts: {}, coopSettings: null };
 
 // ============================================================
 // DOM HELPERS
@@ -295,7 +367,7 @@ function el(tag, attrs = {}, ...children) {
     else if (k === "style" && typeof v === "object") Object.assign(node.style, v);
     else if (k.startsWith("on") && typeof v === "function") node.addEventListener(k.slice(2).toLowerCase(), v);
     else if (k === "dataset") Object.assign(node.dataset, v);
-    else if (v === false || v === null || v === undefined) return; // FIXED: drop false/null/undefined
+    else if (v === false || v === null || v === undefined) return;
     else if (v === true) node.setAttribute(k, "");
     else node.setAttribute(k, v);
   });
@@ -409,6 +481,67 @@ function friendlyAuthError(err) {
 }
 
 // ============================================================
+// REAL RWANDA ADDRESS DATA (Uturere 30 n'Imirenge 416)
+// ============================================================
+const rwandaAddressData = {
+  "Kigali City": {
+    "Gasabo": ["Bumbogo", "Gatsata", "Jali", "Gikomero", "Gisozi", "Jabana", "Kinyinya", "Ndera", "Nduba", "Rusororo", "Rutunga", "Kacyiru", "Kimihurura", "Kimironko", "Remera"],
+    "Kicukiro": ["Gahanga", "Kagaramira", "Kagarama", "Kanombe", "Kicukiro", "Kigarama", "Masaka", "Niboye", "Nyarugunga"],
+    "Nyarugenge": ["Gitega", "Kanyinya", "Kigali", "Kimisagara", "Mageragere", "Muhima", "Nyakabanda", "Nyamirambo", "Nyarugenge", "Rwezamenyo"]
+  },
+  "Northern Province": {
+    "Musanze": ["Busogo", "Cyuve", "Gacaca", "Gashaki", "Gataraga", "Kimonyi", "Kinigi", "Muhoza", "Muko", "Musanze", "Nkotsi", "Nyange", "Remera", "Rwaza", "Shingiro"],
+    "Gicumbi": ["Bukure", "Bwisige", "Byumba", "Cyumba", "Giti", "Kaniga", "Manyagiro", "Miyove", "Mukarange", "Muko", "Mutete", "Nyamiyaga", "Nyankenke", "Rubaya", "Rukomo", "Rushaki", "Rutare", "Ruvune", "Rwamiko", "Shangasha"],
+    "Burera": ["Butaro", "Cyanika", "Gahunga", "Gatebe", "Kagogo", "Kinyababa", "Kinoni", "Kivuye", "Nemba", "Rugarama", "Rugengabari", "Ruhunde", "Rusarabuye", "Rwerere"]
+  },
+  "Southern Province": {
+    "Huye": ["Gishamvu", "Huye", "Karama", "Kigoma", "Kinazi", "Maraba", "Mbazi", "Mukura", "Ngoma", "Ruhashya", "Rusatira", "Rwaniro", "Simbi", "Tumba"],
+    "Muhanga": ["Cyeza", "Kabacuzi", "Kibangu", "Kiyumba", "Muhanga", "Mushishiro", "Nyabinoni", "Nyamabuye", "Nyarusange", "Rongi", "Rugendabari", "Shyogwe"],
+    "Nyanza": ["Busasamana", "Busoro", "Cyabakamyi", "Kibilizi", "Kigoma", "Mukingo", "Muyira", "Ntyazo", "Nyagisozi", "Rwabicuma"]
+  },
+  "Eastern Province": {
+    "Rwamagana": ["Fumbwe", "Gahengeri", "Gishari", "Karenge", "Kigabiro", "Muhazi", "Munyaga", "Munyiginya", "Musha", "Muyumbu", "Nyakariro", "Nzige", "Rubona", "Rwamagana"],
+    "Kayonza": ["Gahini", "Kabare", "Kabarondo", "Mukarange", "Murama", "Murundi", "Nyamirama", "Ndego", "Rwinkwavu"],
+    "Nyagatare": ["Gatunda", "Karama", "Karangazi", "Katabagemu", "Kiyombe", "Matimba", "Mimuri", "Mukama", "Musheri", "Nyagatare", "Rukomo", "Rwimiyaga", "Tabagwe"]
+  },
+  "Western Province": {
+    "Rubavu": ["Bugeshi", "Busasamana", "Cyanzarwe", "Gisenyi", "Kanama", "Kanzenze", "Mudende", "Nyakiliba", "Nyamyumba", "Nyundo", "Rubavu", "Rugerero"],
+    "Karongi": ["Bwishyura", "Gishyita", "Gitesi", "Mubuga", "Murambi", "Murundi", "Mutuntu", "Rubengera", "Rugabano", "Ruganda", "Rwankuba", "Twumba"],
+    "Rusizi": ["Buganza", "Bukunzi", "Bugarama", "Bushenge", "Butare", "Gashonga", "Giheke", "Gihundwe", "Gikundamvura", "Gitambi", "Kamembe", "Muganza", "Mururu", "Nkanka", "Nkombo", "Nkungu", "Nyakabuye", "Nyakarenzo", "Nzahaha", "Rwimbogo"]
+  }
+};
+
+function setupAddressDropdowns() {
+  const provSelect = $("#reg-province");
+  const distSelect = $("#reg-district");
+  const sectSelect = $("#reg-sector");
+
+  provSelect.addEventListener("change", () => {
+    distSelect.innerHTML = '<option value="">Select District</option>';
+    sectSelect.innerHTML = '<option value="">Select Sector</option>';
+    
+    distSelect.disabled = true; sectSelect.disabled = true;
+
+    if (provSelect.value && rwandaAddressData[provSelect.value]) {
+      const districts = Object.keys(rwandaAddressData[provSelect.value]);
+      districts.forEach(d => distSelect.appendChild(new Option(d, d)));
+      distSelect.disabled = false;
+    }
+  });
+
+  distSelect.addEventListener("change", () => {
+    sectSelect.innerHTML = '<option value="">Select Sector</option>';
+    sectSelect.disabled = true;
+
+    if (provSelect.value && distSelect.value) {
+      const sectors = rwandaAddressData[provSelect.value][distSelect.value];
+      sectors.forEach(s => sectSelect.appendChild(new Option(s, s)));
+      sectSelect.disabled = false;
+    }
+  });
+}
+
+// ============================================================
 // LOGIN BUTTON
 // ============================================================
 function bindLoginButton() {
@@ -486,9 +619,9 @@ function bindLoginButton() {
         return;
       }
       const profile = profileSnap.data();
-      const status = profile.status || "pending";
-      if (status !== "approved") {
-        const msgs = { pending: "Account pending approval.", rejected: "Account rejected.", suspended: "Account suspended." };
+      const status = profile.status || "approved";
+      if (status === "rejected" || status === "suspended") {
+        const msgs = { rejected: "Account rejected.", suspended: "Account suspended." };
         showToast(msgs[status] || "Account not approved.", "error", 6000);
         await signOut(auth);
         return;
@@ -538,6 +671,17 @@ function bindRegisterButton() {
     const fullName = $("#reg-fullname").value.trim();
     const email = $("#reg-email").value.trim();
     const phone = $("#reg-phone").value.trim();
+    const nationalId = $("#reg-national-id").value.trim();
+    
+    const province = $("#reg-province").value;
+    const district = $("#reg-district").value;
+    const sector = $("#reg-sector").value;
+    const cell = $("#reg-cell").value.trim();
+    const village = $("#reg-village").value.trim();
+
+    const bankName = $("#reg-bank-name").value;
+    const bankAccount = $("#reg-bank-account").value.trim();
+
     const role = $("#reg-role").value;
     const password = $("#reg-password").value;
     const confirm = $("#reg-confirm").value;
@@ -557,6 +701,46 @@ function bindRegisterButton() {
       $("#reg-phone-error").textContent = "Valid phone required.";
       $("#reg-phone-error").classList.remove("hidden");
       $("#reg-phone").classList.add("error"); valid = false;
+    }
+    if (!nationalId || !/^\d{16}$/.test(nationalId)) {
+      $("#reg-national-id-error").textContent = "National ID must be exactly 16 digits (numbers only).";
+      $("#reg-national-id-error").classList.remove("hidden");
+      $("#reg-national-id").classList.add("error"); valid = false;
+    }
+    if (!province) {
+      $("#reg-province-error").textContent = "Select Province.";
+      $("#reg-province-error").classList.remove("hidden");
+      $("#reg-province").classList.add("error"); valid = false;
+    }
+    if (!district) {
+      $("#reg-district-error").textContent = "Select District.";
+      $("#reg-district-error").classList.remove("hidden");
+      $("#reg-district").classList.add("error"); valid = false;
+    }
+    if (!sector) {
+      $("#reg-sector-error").textContent = "Select Sector.";
+      $("#reg-sector-error").classList.remove("hidden");
+      $("#reg-sector").classList.add("error"); valid = false;
+    }
+    if (!cell) {
+      $("#reg-cell-error").textContent = "Enter Cell name.";
+      $("#reg-cell-error").classList.remove("hidden");
+      $("#reg-cell").classList.add("error"); valid = false;
+    }
+    if (!village) {
+      $("#reg-village-error").textContent = "Enter Village name.";
+      $("#reg-village-error").classList.remove("hidden");
+      $("#reg-village").classList.add("error"); valid = false;
+    }
+    if (!bankName) {
+      $("#reg-bank-name-error").textContent = "Select Bank.";
+      $("#reg-bank-name-error").classList.remove("hidden");
+      $("#reg-bank-name").classList.add("error"); valid = false;
+    }
+    if (!bankAccount || bankAccount.length < 8) {
+      $("#reg-bank-account-error").textContent = "Valid Bank Account required.";
+      $("#reg-bank-account-error").classList.remove("hidden");
+      $("#reg-bank-account").classList.add("error"); valid = false;
     }
     if (!password || password.length < 6) {
       $("#reg-password-error").textContent = "Password min 6 characters.";
@@ -580,18 +764,19 @@ function bindRegisterButton() {
 
       try { await updateProfile(user, { displayName: fullName }); } catch (e) { console.warn("updateProfile:", e); }
 
-      // FIXED: Shyizemo cooperativeId "coop-001" aho kuba null
       await setDoc(doc(db, "profiles", user.uid), {
-        uid: user.uid, fullName, email, phone,
+        uid: user.uid, fullName, email, phone, nationalId,
+        address: { province, district, sector, cell, village },
+        bankInfo: { bankName, accountNumber: bankAccount },
         role: role === "employee" ? "employee" : "member",
-        status: "pending", cooperativeId: "coop-001",
+        status: "approved", cooperativeId: "coop-001", 
         createdAt: serverTimestamp()
       });
 
-      showToast("Account created! Pending admin approval.", "success", 7000);
+      showToast("Account created successfully! You can now log in.", "success", 7000);
       await signOut(auth);
 
-      ["reg-fullname","reg-email","reg-phone","reg-password","reg-confirm"].forEach(id => { const n = $("#"+id); if (n) n.value = ""; });
+      ["reg-fullname","reg-email","reg-phone","reg-national-id","reg-province","reg-district","reg-sector","reg-cell","reg-village","reg-bank-name","reg-bank-account","reg-password","reg-confirm"].forEach(id => { const n = $("#"+id); if (n) n.value = ""; });
       switchAuthTab("login");
       $("#login-email").value = email;
     } catch (err) {
@@ -605,7 +790,7 @@ function bindRegisterButton() {
     }
   });
 
-  ["reg-fullname","reg-email","reg-phone","reg-password","reg-confirm"].forEach(id => {
+  ["reg-fullname","reg-email","reg-phone","reg-national-id","reg-password","reg-confirm"].forEach(id => {
     const n = $("#"+id);
     if (n) n.addEventListener("keydown", e => {
       if (e.key === "Enter") { e.preventDefault(); registerBtn.click(); }
@@ -638,12 +823,17 @@ onAuthStateChanged(auth, async (user) => {
       state.role = profile.role || "member";
       state.cooperativeId = profile.cooperativeId || null;
 
-      const status = profile.status || "pending";
-      if (status !== "approved") {
-        const msgs = { pending: "Account pending approval.", rejected: "Account rejected.", suspended: "Account suspended." };
+      const status = profile.status || "approved";
+      if (status === "rejected" || status === "suspended") {
+        const msgs = { rejected: "Account rejected.", suspended: "Account suspended." };
         showToast(msgs[status] || "Account not approved.", "error", 6000);
         await signOut(auth);
         return;
+      }
+
+      const coopSnap = await getDoc(doc(db, "cooperatives", state.cooperativeId || "coop-001"));
+      if (coopSnap.exists()) {
+        state.coopSettings = coopSnap.data(); 
       }
 
       $("#login-screen").classList.add("hidden");
@@ -663,7 +853,7 @@ onAuthStateChanged(auth, async (user) => {
       showLoading(false);
     }
   } else {
-    state.user = null; state.profile = null; state.role = null; state.cooperativeId = null;
+    state.user = null; state.profile = null; state.role = null; state.cooperativeId = null; state.coopSettings = null;
     $("#app-shell").classList.add("hidden");
     $("#login-screen").classList.remove("hidden");
     $("#page-content").innerHTML = "";
@@ -697,6 +887,7 @@ $("#logout-btn").addEventListener("click", () => {
 const NAV_ITEMS = {
   admin: [
     { id: "dashboard", label: "Dashboard", icon: "fa-chart-pie" },
+    { id: "find-member", label: "Find Member", icon: "fa-search" },
     { id: "users", label: "User Approvals", icon: "fa-user-check" },
     { id: "members", label: "Members", icon: "fa-users" },
     { id: "employees", label: "Employees", icon: "fa-user-tie" },
@@ -704,10 +895,12 @@ const NAV_ITEMS = {
     { id: "loans", label: "Loans", icon: "fa-hand-holding-usd" },
     { id: "transactions", label: "Transactions", icon: "fa-exchange-alt" },
     { id: "announcements", label: "Announcements", icon: "fa-bullhorn" },
-    { id: "reports", label: "Reports", icon: "fa-file-alt" }
+    { id: "reports", label: "Reports", icon: "fa-file-alt" },
+    { id: "settings", label: "Settings", icon: "fa-cog" }
   ],
   employee: [
     { id: "dashboard", label: "Dashboard", icon: "fa-chart-pie" },
+    { id: "find-member", label: "Find Member", icon: "fa-search" },
     { id: "members", label: "Members", icon: "fa-users" },
     { id: "shares", label: "Share Contributions", icon: "fa-coins" },
     { id: "loans", label: "Loans", icon: "fa-hand-holding-usd" },
@@ -748,10 +941,12 @@ function closeMobileSidebar() { $("#sidebar").classList.remove("open"); $("#side
 // ============================================================
 const viewRenderers = {
   dashboard: renderDashboard,
+  "find-member": renderFindMember,
   users: renderUsers,
   members: renderMembers, employees: renderEmployees,
   shares: renderShares, loans: renderLoans, transactions: renderTransactions,
   announcements: renderAnnouncements, reports: renderReports,
+  settings: renderSettings,
   "my-shares": renderMyShares, "my-loans": renderMyLoans, "my-transactions": renderMyTransactions
 };
 
@@ -760,9 +955,9 @@ async function navigate(viewId) {
   setActiveNav(viewId);
   const content = $("#page-content"); content.innerHTML = "";
   const titles = {
-    dashboard: "Dashboard", users: "User Approvals", members: "Member Management", employees: "Employee Management",
+    dashboard: "Dashboard", "find-member": "Shakisha Umukoresha", users: "User Approvals", members: "Member Management", employees: "Employee Management",
     shares: "Share Contributions", loans: "Loan Management", transactions: "Financial Transactions",
-    announcements: "Announcements", reports: "Reports",
+    announcements: "Announcements", reports: "Reports", settings: "Settings",
     "my-shares": "My Share Contributions", "my-loans": "My Loan Applications", "my-transactions": "My Transactions"
   };
   $("#page-title").textContent = titles[viewId] || "Dashboard";
@@ -786,27 +981,16 @@ async function navigate(viewId) {
 // ============================================================
 // DATA HELPERS
 // ============================================================
-// FIXED: Iyi function ubu ishyira cooperativeId muri query
 async function fetchCollection(name, conditions = []) {
   let q = collection(db, name);
-  
-  // Dufata cooperativeId y'umukoresha
   const userCoopId = state.cooperativeId; 
-
-  // Niba ari collection isaba cooperativeId (uretse profiles)
-  if (name !== "profiles" && name !== "cooperatives") {
+  
+  if (name !== "profiles" && name !== "cooperatives" && name !== "users") {
     if (userCoopId) {
       q = query(q, where("cooperativeId", "==", userCoopId));
-    } else {
-      console.warn(`[Fetch] cooperativeId ni null kuri "${name}".`);
     }
   }
-
-  // Ongeraho andi mabwiriza (nka status == 'pending')
-  conditions.forEach(c => { 
-    q = query(q, where(c.field, c.op, c.value)); 
-  });
-
+  conditions.forEach(c => { q = query(q, where(c.field, c.op, c.value)); });
   const snap = await getDocs(q);
   return snap.docs.map(d => ({ id: d.id, ...d.data() }));
 }
@@ -830,17 +1014,6 @@ function statCard(label, value, icon) {
     el("div", { className: "stat-value" }, String(value))
   );
 }
-function aggregateByMonth(items) {
-  const map = {};
-  items.forEach(it => {
-    const ts = it.createdAt || it.date; if (!ts) return;
-    let d; if (ts.toDate) d = ts.toDate(); else if (typeof ts === "number") d = new Date(ts); else if (ts instanceof Date) d = ts; else return;
-    const key = d.toLocaleDateString("en-GB", { year: "numeric", month: "short" });
-    map[key] = (map[key] || 0) + (Number(it.amount) || 0);
-  });
-  const labels = Object.keys(map);
-  return { labels, values: labels.map(l => map[l]) };
-}
 function formGroup(label, id, type = "text", required = false, value = "", readOnly = false) {
   return el("div", { className: "form-group" },
     el("label", { for: id }, label, required ? el("span", { style: { color: "var(--danger)" } }, " *") : null),
@@ -849,13 +1022,165 @@ function formGroup(label, id, type = "text", required = false, value = "", readO
 }
 
 // ============================================================
+// SETTINGS
+// ============================================================
+async function renderSettings(container) {
+  container.appendChild(el("div", { className: "card mb-3" },
+    el("h3", { className: "mb-2" }, "Cooperative Settings"),
+    el("p", { className: "text-muted mb-3" }, "Aha ni ho Admin yandika amakuru y'ikigo (nka nimero ya banki y'ikigo kugira ngo abanyamuryango bayishyure)."),
+    
+    el("div", { className: "grid grid-2" },
+      formGroup("Cooperative Name", "set-coop-name", "text", true, state.coopSettings?.coopName || "CoopConnect Rwanda"),
+      formGroup("Cooperative Bank Name", "set-coop-bank-name", "text", true, state.coopSettings?.coopBankName || ""),
+      formGroup("Cooperative Bank Account", "set-coop-bank-account", "text", true, state.coopSettings?.coopBankAccount || ""),
+      formGroup("Cooperative MoMo Number (MTN/Airtel)", "set-coop-momo", "text", true, state.coopSettings?.coopMomoNumber || ""),
+      formGroup("Contact Email", "set-coop-email", "email", true, state.coopSettings?.coopEmail || ""),
+      formGroup("Contact Phone", "set-coop-phone", "tel", true, state.coopSettings?.coopPhone || "")
+    ),
+    el("button", { type: "button", className: "btn btn-primary mt-2", onClick: async () => {
+      const coopName = $("#set-coop-name").value.trim();
+      const coopBankName = $("#set-coop-bank-name").value.trim();
+      const coopBankAccount = $("#set-coop-bank-account").value.trim();
+      const coopMomoNumber = $("#set-coop-momo").value.trim();
+      const coopEmail = $("#set-coop-email").value.trim();
+      const coopPhone = $("#set-coop-phone").value.trim();
+
+      if (!coopName || !coopBankName || !coopBankAccount || !coopMomoNumber) {
+        showToast("Fill all required fields.", "error"); return;
+      }
+
+      try {
+        showLoading(true);
+        await setDoc(doc(db, "cooperatives", state.cooperativeId || "coop-001"), {
+          coopName, coopBankName, coopBankAccount, coopMomoNumber, coopEmail, coopPhone,
+          updatedAt: serverTimestamp(),
+          updatedBy: state.user.uid
+        }, { merge: true });
+
+        state.coopSettings = { coopName, coopBankName, coopBankAccount, coopMomoNumber, coopEmail, coopPhone };
+        showToast("Settings saved successfully.", "success");
+      } catch (err) {
+        showToast("Failed to save settings: " + err.message, "error");
+      } finally {
+        showLoading(false);
+      }
+    } }, "Save Settings")
+  ));
+}
+
+// ============================================================
+// FIND MEMBER
+// ============================================================
+async function renderFindMember(container) {
+  container.appendChild(el("div", { className: "card mb-3" },
+    el("h3", { className: "mb-2" }, "Shakisha Umukoresha"),
+    el("p", { className: "text-muted mb-2" }, "Andika izina, telefone, cyangwa National ID y'umukoresha ushaka kureba amakuru ye yose (Shares, Loans, n'ibindi)."),
+    el("div", { className: "flex gap-2", style: { maxWidth: "600px" } },
+      el("input", { type: "text", className: "form-control", id: "global-search-input", placeholder: "Andika izina cyangwa telefone..." }),
+      el("button", { className: "btn btn-primary", id: "global-search-btn" }, el("i", { className: "fas fa-search" }), "Shakisha")
+    )
+  ));
+
+  const resultsContainer = el("div", { id: "search-results-container" });
+  container.appendChild(resultsContainer);
+
+  async function performSearch() {
+    const queryStr = $("#global-search-input").value.trim().toLowerCase();
+    if (!queryStr) { showToast("Andika ikintu ushaka gushakisha.", "warning"); return; }
+
+    resultsContainer.innerHTML = "";
+    showLoading(true);
+
+    try {
+      const allProfiles = await fetchCollection("profiles");
+      const matchedProfiles = allProfiles.filter(p => 
+        (p.fullName || "").toLowerCase().includes(queryStr) || 
+        (p.phone || "").toLowerCase().includes(queryStr) || 
+        (p.nationalId || "").toLowerCase().includes(queryStr)
+      );
+
+      if (matchedProfiles.length === 0) {
+        resultsContainer.appendChild(el("div", { className: "card empty-state" }, el("i", { className: "fas fa-search" }), el("p", {}, "Nta mukoresha wabonetse kuri iyi search.")));
+        return;
+      }
+
+      for (const profile of matchedProfiles) {
+        const memberCard = el("div", { className: "card mb-3" });
+        
+        memberCard.appendChild(el("div", { className: "flex justify-between items-center mb-2", style: { borderBottom: "2px solid var(--pale-green)", paddingBottom: "10px" } },
+          el("div", {},
+            el("h3", { style: { color: "var(--dark-green)" } }, profile.fullName),
+            el("p", { className: "text-sm text-muted" }, `Telefone: ${profile.phone || "—"} | Email: ${profile.email || "—"} | National ID: ${profile.nationalId || "—"}`),
+            profile.bankInfo ? el("p", { className: "text-sm text-muted" }, `Bank: ${profile.bankInfo.bankName || "—"} | Account: ${profile.bankInfo.accountNumber || "—"}`) : null,
+            profile.address ? el("p", { className: "text-sm text-muted" }, `Aderesi: ${profile.address.district}, ${profile.address.sector}, ${profile.address.cell}`) : null
+          ),
+          el("div", {},
+            el("span", { className: "badge badge-" + (profile.status || "approved") }, profile.status || "approved")
+          )
+        ));
+
+        const hisShares = await fetchCollection("share_contributions", [{ field: "memberId", op: "==", value: profile.uid }]);
+        const totalShares = hisShares.filter(c => c.status === "confirmed").reduce((s, c) => s + (Number(c.amount) || 0), 0);
+        
+        const hisLoans = await fetchCollection("loan_applications", [{ field: "memberId", op: "==", value: profile.uid }]);
+        const hisTx = await fetchCollection("transactions", [{ field: "userId", op: "==", value: profile.uid }]);
+
+        const infoGrid = el("div", { className: "grid grid-3 mb-3" },
+          statCard("Total Shares", formatCurrency(totalShares), "fa-coins"),
+          statCard("Loans", hisLoans.length.toString(), "fa-hand-holding-usd"),
+          statCard("Transactions", hisTx.length.toString(), "fa-exchange-alt")
+        );
+        memberCard.appendChild(infoGrid);
+
+        if (hisLoans.length > 0) {
+          memberCard.appendChild(el("h4", { style: { color: "var(--dark-green)", marginTop: "15px" } }, "Inguzanyo Ze"));
+          memberCard.appendChild(el("div", { className: "table-wrapper mb-3" }, el("table", {},
+            el("thead", {}, el("tr", {}, el("th", {}, "Date"), el("th", {}, "Amount"), el("th", {}, "Purpose"), el("th", {}, "Status"))),
+            el("tbody", {}, ...hisLoans.map(l => el("tr", {},
+              el("td", {}, formatDate(l.createdAt || l.applicationDate)),
+              el("td", {}, formatCurrency(l.amount, l.currency)),
+              el("td", {}, l.purpose || "—"),
+              el("td", {}, el("span", { className: "badge badge-" + (l.status || "pending") }, l.status || "pending"))
+            )))
+          )));
+        }
+
+        if (hisShares.length > 0) {
+          memberCard.appendChild(el("h4", { style: { color: "var(--dark-green)", marginTop: "15px" } }, "Amateka y'Umutsimo (Shares)"));
+          memberCard.appendChild(el("div", { className: "table-wrapper mb-3" }, el("table", {},
+            el("thead", {}, el("tr", {}, el("th", {}, "Date"), el("th", {}, "Amount"), el("th", {}, "Method"), el("th", {}, "Status"))),
+            el("tbody", {}, ...hisShares.map(c => el("tr", {},
+              el("td", {}, formatDate(c.createdAt || c.date)),
+              el("td", {}, formatCurrency(c.amount, c.currency)),
+              el("td", {}, c.paymentMethod || "—"),
+              el("td", {}, el("span", { className: "badge badge-" + (c.status || "pending") }, c.status || "pending"))
+            )))
+          )));
+        }
+
+        resultsContainer.appendChild(memberCard);
+      }
+    } catch (err) {
+      console.error("Search error:", err);
+      showToast("Habaye ikibazo: " + err.message, "error");
+    } finally {
+      showLoading(false);
+    }
+  }
+
+  $("#global-search-btn").addEventListener("click", performSearch);
+  $("#global-search-input").addEventListener("keydown", e => {
+    if (e.key === "Enter") { e.preventDefault(); performSearch(); }
+  });
+}
+
+// ============================================================
 // USERS (APPROVALS)
 // ============================================================
 async function renderUsers(container) {
   const allUsers = await fetchCollection("profiles");
-  // Kugarura gusa abandi bakoresha (tutareba uwo uriho)
   const otherUsers = allUsers.filter(u => u.uid !== state.user.uid);
-  const pendingUsers = otherUsers.filter(u => u.status === "pending");
+  const pendingUsers = otherUsers.filter(u => u.status === "pending"); 
 
   if (otherUsers.length === 0) {
     container.appendChild(el("div", { className: "card empty-state" }, el("i", { className: "fas fa-users" }), el("p", {}, "No other users found.")));
@@ -875,7 +1200,7 @@ async function renderUsers(container) {
         el("td", {}, u.fullName || "—"),
         el("td", {}, u.email || "—"),
         el("td", {}, el("span", { style: { textTransform: "capitalize" } }, u.role || "member")),
-        el("td", {}, el("span", { className: "badge badge-" + (u.status || "pending") }, u.status || "pending")),
+        el("td", {}, el("span", { className: "badge badge-" + (u.status || "approved") }, u.status || "approved")),
         el("td", {},
           u.status === "pending"
             ? el("div", { className: "flex gap-1" },
@@ -944,31 +1269,14 @@ async function renderAdminDashboard(container) {
     statCard("Income (RWF)", income.toLocaleString(), "fa-arrow-up"),
     statCard("Expenses (RWF)", expenses.toLocaleString(), "fa-arrow-down")
   ));
-
-  const chartsGrid = el("div", { className: "grid grid-2 mb-3" });
-  chartsGrid.appendChild(el("div", { className: "card" },
-    el("h3", { className: "mb-2" }, "Share Contributions"),
-    el("div", { className: "chart-container" }, el("canvas", { id: "chart-contributions" }))
-  ));
-  chartsGrid.appendChild(el("div", { className: "card" },
-    el("h3", { className: "mb-2" }, "Income vs Expenses"),
-    el("div", { className: "chart-container" }, el("canvas", { id: "chart-income-expenses" }))
-  ));
-  container.appendChild(chartsGrid);
-
+  
   container.appendChild(el("div", { className: "card mb-3" },
-    el("h3", { className: "mb-2" }, "Loan Application Status"),
-    el("div", { className: "chart-container", style: { height: "220px" } }, el("canvas", { id: "chart-loans" }))
-  ));
-
-  const recent = transactions.slice(0, 5);
-  container.appendChild(el("div", { className: "card" },
     el("h3", { className: "mb-2" }, "Recent Activities"),
-    recent.length === 0
+    transactions.length === 0
       ? el("div", { className: "empty-state" }, el("i", { className: "fas fa-inbox" }), el("p", {}, "No recent activities."))
       : el("div", { className: "table-wrapper" }, el("table", {},
           el("thead", {}, el("tr", {}, el("th", {}, "Date"), el("th", {}, "Type"), el("th", {}, "Amount"), el("th", {}, "Description"))),
-          el("tbody", {}, ...recent.map(t =>
+          el("tbody", {}, ...transactions.slice(0, 5).map(t =>
             el("tr", {},
               el("td", {}, formatDate(t.date || t.createdAt)),
               el("td", {}, t.type || t.category || "—"),
@@ -978,39 +1286,6 @@ async function renderAdminDashboard(container) {
           ))
         ))
   ));
-
-  requestAnimationFrame(() => {
-    const cc = $("#chart-contributions");
-    if (cc) {
-      const m = aggregateByMonth(contributions.filter(c => c.status === "confirmed"));
-      state.charts.contrib = new Chart(cc, {
-        type: "bar",
-        data: { labels: m.labels, datasets: [{ label: "Share Contributions (RWF)", data: m.values, backgroundColor: "#2e7d32", borderRadius: 6 }] },
-        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
-      });
-    }
-    const ic = $("#chart-income-expenses");
-    if (ic) {
-      state.charts.ie = new Chart(ic, {
-        type: "doughnut",
-        data: { labels: ["Income", "Expenses"], datasets: [{ data: [income, expenses], backgroundColor: ["#43a047", "#e53935"] }] },
-        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: "bottom" } } }
-      });
-    }
-    const lc = $("#chart-loans");
-    if (lc) {
-      const sc = { pending: 0, under_review: 0, approved: 0, rejected: 0, disbursed: 0, repaid: 0 };
-      loans.forEach(l => { if (sc[l.status] !== undefined) sc[l.status]++; });
-      state.charts.loans = new Chart(lc, {
-        type: "polarArea",
-        data: {
-          labels: Object.keys(sc).map(s => s.replace("_", " ")),
-          datasets: [{ data: Object.values(sc), backgroundColor: ["#ffb74d", "#fff176", "#81c784", "#e57373", "#64b5f6", "#4db6ac"] }]
-        },
-        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: "bottom" } } }
-      });
-    }
-  });
 }
 
 async function renderEmployeeDashboard(container) {
@@ -1036,39 +1311,34 @@ async function renderEmployeeDashboard(container) {
           )
         ))
   ));
-  container.appendChild(el("div", { className: "card" },
-    el("h3", { className: "mb-2" }, "My Assigned Activities"),
-    activities.length === 0
-      ? el("div", { className: "empty-state" }, el("i", { className: "fas fa-tasks" }), el("p", {}, "No activities assigned."))
-      : el("div", { className: "table-wrapper" }, el("table", {},
-          el("thead", {}, el("tr", {}, el("th", {}, "Activity"), el("th", {}, "Date"), el("th", {}, "Status"))),
-          el("tbody", {}, ...activities.slice(0, 5).map(a =>
-            el("tr", {},
-              el("td", {}, a.title || a.name || "—"),
-              el("td", {}, formatDate(a.date || a.createdAt)),
-              el("td", {}, el("span", { className: "badge badge-" + (a.status || "pending") }, a.status || "pending"))
-            )
-          ))
-        ))
-  ));
 }
 
 async function renderMemberDashboard(container) {
   const uid = state.user.uid;
-  const [myContrib, myLoans, myTx, ann] = await Promise.all([
+  const [myContrib, myLoans, ann] = await Promise.all([
     fetchCollection("share_contributions", [{ field: "memberId", op: "==", value: uid }]),
     fetchCollection("loan_applications", [{ field: "memberId", op: "==", value: uid }]),
-    fetchCollection("transactions", [{ field: "userId", op: "==", value: uid }]),
     fetchCollection("announcements")
   ]);
   const totalShares = myContrib.filter(c => c.status === "confirmed").reduce((s, c) => s + (Number(c.amount) || 0), 0);
   const pendingLoans = myLoans.filter(l => l.status === "pending" || l.status === "under_review").length;
   const approvedLoans = myLoans.filter(l => l.status === "approved" || l.status === "disbursed").length;
+  
+  if (state.coopSettings && state.coopSettings.coopBankAccount) {
+    container.appendChild(el("div", { className: "card mb-3", style: { borderLeft: "5px solid var(--info)" } },
+      el("h4", { style: { color: "var(--info)", marginBottom: "10px" } }, "Konti ya Banki y'ikigo (Kwishyura)"),
+      el("p", {}, el("strong", {}, "Bank Name: "), state.coopSettings.coopBankName || "Ntibirabura"),
+      el("p", {}, el("strong", {}, "Account Number: "), state.coopSettings.coopBankAccount || "Ntibirabura"),
+      el("p", { className: "text-sm text-muted mt-1" }, "Ushobora kohereza amafaranga kuri iyi konti hanyuma ukandika nimero ya transaction mu kwishyura.")
+    ));
+  }
+
   container.appendChild(el("div", { className: "grid grid-3 mb-3" },
     statCard("Total Shares (RWF)", totalShares.toLocaleString(), "fa-coins"),
     statCard("Pending Loans", pendingLoans, "fa-clock"),
     statCard("Approved Loans", approvedLoans, "fa-check-circle")
   ));
+  
   container.appendChild(el("div", { className: "card mb-3" },
     el("h3", { className: "mb-2" }, "My Recent Share Contributions"),
     myContrib.length === 0
@@ -1084,34 +1354,6 @@ async function renderMemberDashboard(container) {
           ))
         ))
   ));
-  container.appendChild(el("div", { className: "card mb-3" },
-    el("h3", { className: "mb-2" }, "My Loan Applications"),
-    myLoans.length === 0
-      ? el("div", { className: "empty-state" }, el("i", { className: "fas fa-hand-holding-usd" }), el("p", {}, "No loan applications yet."))
-      : el("div", { className: "table-wrapper" }, el("table", {},
-          el("thead", {}, el("tr", {}, el("th", {}, "Date"), el("th", {}, "Amount"), el("th", {}, "Purpose"), el("th", {}, "Status"))),
-          el("tbody", {}, ...myLoans.map(l =>
-            el("tr", {},
-              el("td", {}, formatDate(l.createdAt || l.applicationDate)),
-              el("td", {}, formatCurrency(l.amount, l.currency)),
-              el("td", {}, l.purpose || "—"),
-              el("td", {}, el("span", { className: "badge badge-" + (l.status || "pending") }, (l.status || "pending").replace("_", " ")))
-            )
-          ))
-        ))
-  ));
-  container.appendChild(el("div", { className: "card" },
-    el("h3", { className: "mb-2" }, "Cooperative Announcements"),
-    ann.length === 0
-      ? el("div", { className: "empty-state" }, el("i", { className: "fas fa-bullhorn" }), el("p", {}, "No announcements yet."))
-      : el("div", {}, ...ann.slice(0, 3).map(a =>
-          el("div", { className: "mb-2 p-1", style: { borderBottom: "1px solid #eee" } },
-            el("div", { className: "font-bold" }, a.title || "Untitled"),
-            el("div", { className: "text-sm text-muted" }, a.content || ""),
-            el("div", { className: "text-sm text-muted mt-1" }, formatDate(a.createdAt))
-          )
-        ))
-  ));
 }
 
 // ============================================================
@@ -1121,7 +1363,7 @@ async function renderMembers(container) {
   const members = await fetchCollection("cooperative_members");
 
   container.appendChild(el("div", { className: "search-bar" },
-    el("input", { type: "text", className: "form-control", placeholder: "Search members...", id: "member-search" }),
+    el("input", { type: "text", className: "form-control", placeholder: "Shakisha izina, telefone, cyangwa National ID...", id: "member-search" }),
     el("select", { className: "form-control", id: "member-status-filter", style: { maxWidth: "180px" } },
       el("option", { value: "" }, "All Statuses"),
       el("option", { value: "active" }, "Active"),
@@ -1141,15 +1383,20 @@ async function renderMembers(container) {
       return;
     }
     tableContainer.appendChild(el("div", { className: "table-wrapper" }, el("table", {},
-      el("thead", {}, el("tr", {}, el("th", {}, "Member #"), el("th", {}, "Full Name"), el("th", {}, "Phone"), el("th", {}, "Email"), el("th", {}, "Status"), el("th", {}, "Actions"))),
+      el("thead", {}, el("tr", {}, el("th", {}, "Member #"), el("th", {}, "Full Name"), el("th", {}, "Phone"), el("th", {}, "National ID"), el("th", {}, "Status"), el("th", {}, "Actions"))),
       el("tbody", {}, ...filtered.map(m =>
         el("tr", {},
           el("td", {}, m.memberNumber || "—"),
-          el("td", {}, m.fullName || "—"),
+          el("td", {}, el("a", { href: "#", onClick: (e) => { e.preventDefault(); showMemberDetails(m); }, style: { color: "var(--mid-green)", fontWeight: "bold", textDecoration: "underline" } }, m.fullName || "—")),
           el("td", {}, m.phone || "—"),
-          el("td", {}, m.email || "—"),
+          el("td", {}, m.nationalId || "—"),
           el("td", {}, el("span", { className: "badge badge-" + (m.status || m.membershipStatus || "pending") }, m.status || m.membershipStatus || "pending")),
-          el("td", {}, el("button", { className: "btn btn-sm btn-outline", onClick: () => editMember(m) }, el("i", { className: "fas fa-edit" })))
+          el("td", {},
+            el("div", { className: "flex gap-1" },
+              el("button", { className: "btn btn-sm btn-outline", onClick: () => showMemberDetails(m) }, el("i", { className: "fas fa-eye" }), "Reba"),
+              el("button", { className: "btn btn-sm btn-secondary", onClick: () => editMember(m) }, el("i", { className: "fas fa-edit" }))
+            )
+          )
         )
       ))
     )));
@@ -1159,7 +1406,7 @@ async function renderMembers(container) {
     const s = ($("#member-search")?.value || "").toLowerCase();
     const sf = $("#member-status-filter")?.value || "";
     renderTable(members.filter(m => {
-      const ms = !s || (m.fullName || "").toLowerCase().includes(s) || (m.email || "").toLowerCase().includes(s) || (m.memberNumber || "").toLowerCase().includes(s);
+      const ms = !s || (m.fullName || "").toLowerCase().includes(s) || (m.phone || "").toLowerCase().includes(s) || (m.nationalId || "").toLowerCase().includes(s);
       const st = (m.status || m.membershipStatus || "pending");
       return ms && (!sf || st === sf);
     }));
@@ -1169,14 +1416,49 @@ async function renderMembers(container) {
   $("#member-status-filter")?.addEventListener("change", applyFilter);
   $("#add-member-btn").addEventListener("click", addMember);
 
+  function showMemberDetails(member) {
+    const content = el("div", {},
+      el("div", { className: "mb-3" },
+        el("h4", { style: { color: "var(--dark-green)", marginBottom: "10px" } }, "Amakuru y'Umukoresha"),
+        el("p", {}, el("strong", {}, "Amazina: "), member.fullName || "—"),
+        el("p", {}, el("strong", {}, "Telefone: "), member.phone || "—"),
+        el("p", {}, el("strong", {}, "Email: "), member.email || "—"),
+        el("p", {}, el("strong", {}, "National ID: "), member.nationalId || "—"),
+        el("p", {}, el("strong", {}, "Member Number: "), member.memberNumber || "—")
+      ),
+      el("div", { className: "mb-3" },
+        el("h4", { style: { color: "var(--dark-green)", marginBottom: "10px" } }, "Aho Atuye"),
+        member.address ? el("div", {},
+          el("p", {}, el("strong", {}, "Intara: "), member.address.province || "—"),
+          el("p", {}, el("strong", {}, "Akarere: "), member.address.district || "—"),
+          el("p", {}, el("strong", {}, "Umurenge: "), member.address.sector || "—"),
+          el("p", {}, el("strong", {}, "Akagari: "), member.address.cell || "—"),
+          el("p", {}, el("strong", {}, "Umudugudu: "), member.address.village || "—")
+        ) : el("p", { className: "text-muted" }, "Nta aderesi yabitswe.")
+      ),
+      el("div", { className: "mb-3" },
+        el("h4", { style: { color: "var(--dark-green)", marginBottom: "10px" } }, "Konti ya Banki"),
+        member.bankInfo ? el("div", {},
+          el("p", {}, el("strong", {}, "Bank Name: "), member.bankInfo.bankName || "—"),
+          el("p", {}, el("strong", {}, "Account Number: "), member.bankInfo.accountNumber || "—")
+        ) : el("p", { className: "text-muted" }, "Nta konti ya banki yabitswe.")
+      ),
+      el("div", { className: "mb-3" },
+        el("h4", { style: { color: "var(--dark-green)", marginBottom: "10px" } }, "Ubwishyu n'Inguzanyo"),
+        el("p", {}, el("strong", {}, "Status: "), el("span", { className: "badge badge-" + (member.status || "pending") }, member.status || "pending")),
+      ),
+      el("button", { type: "button", className: "btn btn-primary w-full mt-2", onClick: () => document.getElementById("modal-backdrop")?.remove() }, "Funga")
+    );
+    openModal("Amakuru yuzuye", content);
+  }
+
   function addMember() {
     const form = el("div", {},
       formGroup("Full Name", "member-fullName", "text", true),
       formGroup("Member Number", "member-number", "text", true),
       formGroup("Phone", "member-phone", "tel", true),
       formGroup("Email", "member-email", "email", true),
-      formGroup("District", "member-district", "text", false),
-      formGroup("Membership Date", "member-date", "date", false),
+      formGroup("National ID (16 Digits)", "member-national-id", "text", true),
       el("div", { className: "form-group" },
         el("label", {}, "Status"),
         el("select", { className: "form-control", id: "member-status" },
@@ -1190,14 +1472,13 @@ async function renderMembers(container) {
         const memberNumber = $("#member-number").value.trim();
         const phone = $("#member-phone").value.trim();
         const email = $("#member-email").value.trim();
-        if (!fullName || !memberNumber || !phone || !email) { showToast("Fill all required fields.", "error"); return; }
+        const nationalId = $("#member-national-id").value.trim();
+        if (!fullName || !memberNumber || !phone || !email || !nationalId) { showToast("Fill all required fields.", "error"); return; }
         if (members.find(m => m.memberNumber === memberNumber)) { showToast("Member number already exists.", "error"); return; }
         try {
           showLoading(true);
           await addDoc(collection(db, "cooperative_members"), {
-            cooperativeId: state.cooperativeId, fullName, memberNumber, phone, email,
-            district: $("#member-district").value.trim(),
-            membershipDate: $("#member-date").value || null,
+            cooperativeId: state.cooperativeId, fullName, memberNumber, phone, email, nationalId,
             status: $("#member-status").value,
             createdAt: serverTimestamp(), createdBy: state.user.uid
           });
@@ -1217,7 +1498,7 @@ async function renderMembers(container) {
       formGroup("Member Number", "edit-number", "text", true, member.memberNumber, true),
       formGroup("Phone", "edit-phone", "tel", true, member.phone),
       formGroup("Email", "edit-email", "email", true, member.email),
-      formGroup("District", "edit-district", "text", false, member.district),
+      formGroup("National ID", "edit-national-id", "text", true, member.nationalId || ""),
       el("div", { className: "form-group" },
         el("label", {}, "Status"),
         el("select", { className: "form-control", id: "edit-status" },
@@ -1233,7 +1514,7 @@ async function renderMembers(container) {
             fullName: $("#edit-fullName").value.trim(),
             phone: $("#edit-phone").value.trim(),
             email: $("#edit-email").value.trim(),
-            district: $("#edit-district").value.trim(),
+            nationalId: $("#edit-national-id").value.trim(),
             status: $("#edit-status").value,
             updatedAt: serverTimestamp(), updatedBy: state.user.uid
           });
@@ -1297,32 +1578,113 @@ async function renderEmployees(container) {
 }
 
 // ============================================================
-// SHARES
+// SHARES (ADMIN VIEW) - IYEMEZA RIHITA RIJYA MURI INCOME
 // ============================================================
 async function renderShares(container) {
   const contributions = await fetchCollection("share_contributions");
+
   container.appendChild(el("div", { className: "grid grid-3 mb-3" },
-    statCard("Total Confirmed", contributions.filter(c => c.status === "confirmed").reduce((s, c) => s + (Number(c.amount) || 0), 0).toLocaleString(), "fa-check-circle"),
-    statCard("Pending", contributions.filter(c => c.status === "pending").length, "fa-clock"),
+    statCard("Total Confirmed",
+      contributions.filter(c => c.status === "confirmed")
+        .reduce((s, c) => s + (Number(c.amount) || 0), 0).toLocaleString(), "fa-check-circle"),
+    statCard("Pending Approval",
+      contributions.filter(c => c.status === "pending").length, "fa-clock"),
     statCard("Total Records", contributions.length, "fa-list")
   ));
+
   if (contributions.length === 0) {
-    container.appendChild(el("div", { className: "card empty-state" }, el("i", { className: "fas fa-coins" }), el("p", {}, "No share contributions recorded yet.")));
+    container.appendChild(el("div", { className: "card empty-state" },
+      el("i", { className: "fas fa-coins" }),
+      el("p", {}, "No share contributions recorded yet.")));
     return;
   }
+
+  const sorted = [...contributions].sort((a, b) => {
+    if (a.status === "pending" && b.status !== "pending") return -1;
+    if (a.status !== "pending" && b.status === "pending") return 1;
+    return 0;
+  });
+
   container.appendChild(el("div", { className: "table-wrapper" }, el("table", {},
-    el("thead", {}, el("tr", {}, el("th", {}, "Date"), el("th", {}, "Member ID"), el("th", {}, "Amount"), el("th", {}, "Method"), el("th", {}, "Status"), el("th", {}, "Reference"))),
-    el("tbody", {}, ...contributions.map(c =>
+    el("thead", {}, el("tr", {},
+      el("th", {}, "Date"),
+      el("th", {}, "Member"),
+      el("th", {}, "Amount"),
+      el("th", {}, "Method"),
+      el("th", {}, "Reference"),
+      el("th", {}, "Status"),
+      el("th", {}, "Actions")
+    )),
+    el("tbody", {}, ...sorted.map(c =>
       el("tr", {},
         el("td", {}, formatDate(c.createdAt || c.date)),
-        el("td", {}, c.memberId || "—"),
+        el("td", {}, c.memberName || c.memberId || "—"),
         el("td", {}, formatCurrency(c.amount, c.currency)),
         el("td", {}, c.paymentMethod || "—"),
+        el("td", {}, c.reference || "—"),
         el("td", {}, el("span", { className: "badge badge-" + (c.status || "pending") }, c.status || "pending")),
-        el("td", {}, c.reference || c.transactionRef || "—")
+        el("td", {},
+          c.status === "pending"
+            ? el("div", { className: "flex gap-1" },
+                el("button", {
+                  className: "btn btn-sm btn-secondary",
+                  onClick: () => updateShareStatus(c, "confirmed")
+                }, "Approve"),
+                el("button", {
+                  className: "btn btn-sm btn-danger",
+                  onClick: () => updateShareStatus(c, "rejected")
+                }, "Reject")
+              )
+            : el("span", { className: "text-muted text-sm" }, "—")
+        )
       )
     ))
   )));
+
+  async function updateShareStatus(shareData, newStatus) {
+    const confirmMessage = newStatus === "confirmed" 
+      ? `Banza ujye kuri Banki ya Cooperative urebe niba aya mafaranga (${formatCurrency(shareData.amount)}) yinjiye. Niba yinjiye, kanda Confirm.`
+      : `Set this share contribution to "${newStatus}"?`;
+
+    confirmDialog(
+      "Confirm Action",
+      confirmMessage,
+      async () => {
+        try {
+          showLoading(true);
+          
+          await updateDoc(doc(db, "share_contributions", shareData.id), {
+            status: newStatus,
+            approvedBy: state.user.uid,
+            approvedAt: serverTimestamp(),
+            updatedAt: serverTimestamp()
+          });
+
+          if (newStatus === "confirmed") {
+            await addDoc(collection(db, "transactions"), {
+              cooperativeId: state.cooperativeId,
+              type: "income",
+              category: "share_contribution",
+              amount: Number(shareData.amount),
+              currency: "RWF",
+              description: `Share Contribution from ${shareData.memberName || shareData.memberId}`,
+              reference: shareData.reference || "—",
+              userId: shareData.memberId,
+              createdAt: serverTimestamp(),
+              date: serverTimestamp()
+            });
+          }
+
+          showToast(`Contribution ${newStatus}. Amount added to Income.`, "success");
+          navigate("shares");
+        } catch (err) {
+          showToast("Failed: " + err.message, "error");
+        } finally {
+          showLoading(false);
+        }
+      }
+    );
+  }
 }
 
 // ============================================================
@@ -1340,11 +1702,11 @@ async function renderLoans(container) {
     return;
   }
   container.appendChild(el("div", { className: "table-wrapper" }, el("table", {},
-    el("thead", {}, el("tr", {}, el("th", {}, "Date"), el("th", {}, "Member ID"), el("th", {}, "Amount"), el("th", {}, "Purpose"), el("th", {}, "Status"), el("th", {}, "Actions"))),
+    el("thead", {}, el("tr", {}, el("th", {}, "Date"), el("th", {}, "Member Name"), el("th", {}, "Amount"), el("th", {}, "Purpose"), el("th", {}, "Status"), el("th", {}, "Actions"))),
     el("tbody", {}, ...loans.map(l =>
       el("tr", {},
         el("td", {}, formatDate(l.createdAt || l.applicationDate)),
-        el("td", {}, l.memberId || "—"),
+        el("td", {}, l.memberName || l.memberId || "—"), 
         el("td", {}, formatCurrency(l.amount, l.currency)),
         el("td", {}, l.purpose || "—"),
         el("td", {}, el("span", { className: "badge badge-" + (l.status || "pending") }, (l.status || "pending").replace("_", " "))),
@@ -1497,7 +1859,7 @@ function exportCSV(data, filename) {
     if (v && typeof v === "object" && v.toDate) v = v.toDate().toISOString();
     if (v && typeof v === "object") v = JSON.stringify(v);
     let str = String(v ?? "");
-    if (/^[=+\-@]/.test(str)) str = "'" + str; // FIXED: Prevent CSV Injection
+    if (/^[=+\-@]/.test(str)) str = "'" + str; 
     return `"${str.replace(/"/g, '""')}"`;
   }).join(","));
   const csv = [header, ...rows].join("\n");
@@ -1510,54 +1872,201 @@ function exportCSV(data, filename) {
 }
 
 // ============================================================
-// MEMBER-SPECIFIC VIEWS
+// MEMBER VIEWS (MY SHARES, MY LOANS, MY TRANSACTIONS)
 // ============================================================
 async function renderMyShares(container) {
   const uid = state.user.uid;
   const contrib = await fetchCollection("share_contributions", [{ field: "memberId", op: "==", value: uid }]);
   const total = contrib.filter(c => c.status === "confirmed").reduce((s, c) => s + (Number(c.amount) || 0), 0);
+
   container.appendChild(el("div", { className: "grid grid-2 mb-3" },
     statCard("My Total Shares", total.toLocaleString(), "fa-coins"),
     statCard("Records", contrib.length, "fa-list")
   ));
-  if (contrib.length === 0) {
-    container.appendChild(el("div", { className: "card empty-state" }, el("i", { className: "fas fa-coins" }), el("p", {}, "You have no share contributions yet.")));
-    return;
+
+  container.appendChild(el("div", { className: "search-bar" },
+    el("input", { type: "text", className: "form-control", placeholder: "Shakisha amafaranga watanze...", id: "my-shares-search" })
+  ));
+
+  const tableContainer = el("div", { id: "my-shares-table-container" });
+  container.appendChild(tableContainer);
+
+  function renderTable(filtered) {
+    tableContainer.innerHTML = "";
+    if (filtered.length === 0) {
+      tableContainer.appendChild(el("div", { className: "card empty-state" }, el("i", { className: "fas fa-coins" }), el("p", {}, "Nta musanzu ubonetse.")));
+      return;
+    }
+    tableContainer.appendChild(el("div", { className: "table-wrapper" }, el("table", {},
+      el("thead", {}, el("tr", {},
+        el("th", {}, "Date"),
+        el("th", {}, "Amount"),
+        el("th", {}, "Method"),
+        el("th", {}, "Status"),
+        el("th", {}, "Reference")
+      )),
+      el("tbody", {}, ...filtered.map(c =>
+        el("tr", {},
+          el("td", {}, formatDate(c.createdAt || c.date)),
+          el("td", {}, formatCurrency(c.amount, c.currency)),
+          el("td", {}, c.paymentMethod || "—"),
+          el("td", {}, el("span", { className: "badge badge-" + (c.status || "pending") }, c.status || "pending")),
+          el("td", {}, c.reference || "—")
+        )
+      ))
+    )));
   }
-  container.appendChild(el("div", { className: "table-wrapper" }, el("table", {},
-    el("thead", {}, el("tr", {}, el("th", {}, "Date"), el("th", {}, "Amount"), el("th", {}, "Status"), el("th", {}, "Reference"))),
-    el("tbody", {}, ...contrib.map(c =>
-      el("tr", {},
-        el("td", {}, formatDate(c.createdAt || c.date)),
-        el("td", {}, formatCurrency(c.amount, c.currency)),
-        el("td", {}, el("span", { className: "badge badge-" + (c.status || "pending") }, c.status || "pending")),
-        el("td", {}, c.reference || "—")
-      )
-    ))
-  )));
+
+  $("#my-shares-search")?.addEventListener("input", (e) => {
+    const s = e.target.value.toLowerCase();
+    renderTable(contrib.filter(c => 
+      (c.amount || "").toString().includes(s) || 
+      (c.reference || "").toLowerCase().includes(s) ||
+      (c.status || "").toLowerCase().includes(s)
+    ));
+  });
+
+  renderTable(contrib);
+
+  container.appendChild(el("div", { className: "mt-3" },
+    el("button", { className: "btn btn-primary", onClick: () => submitSharePayment() },
+      el("i", { className: "fas fa-plus" }), "Submit Share Payment")
+  ));
+
+  function submitSharePayment() {
+    const form = el("div", {},
+      formGroup("Amount (RWF)", "share-amount", "number", true),
+      el("div", { className: "form-group" },
+        el("label", {}, "Payment Method"),
+        el("select", { className: "form-control", id: "share-method" },
+          el("option", { value: "mobile_money" }, "Mobile Money"),
+          el("option", { value: "bank_transfer" }, "Bank Transfer"),
+          el("option", { value: "cash" }, "Cash"),
+          el("option", { value: "other" }, "Other")
+        )
+      ),
+      formGroup("Reference / Transaction ID", "share-reference", "text", false),
+      
+      // Mobile Money info
+      el("div", { id: "momo-info", className: "hidden", style: { backgroundColor: "#e8f5e9", padding: "10px", borderRadius: "5px", marginTop: "10px" } },
+        el("p", { style: { fontWeight: "bold", color: "var(--dark-green)" } }, "Amakuru yo kwishyura kuri Mobile Money:"),
+        el("p", {}, el("strong", {}, "Cooperative MoMo Number: "), state.coopSettings?.coopMomoNumber || "Ntibirabura"),
+        el("p", { className: "text-sm text-muted mt-1" }, "Nyuma yo kohereza amafaranga kuri iyi nimero, andika nimero ya transaction (Reference) hano hejuru.")
+      ),
+
+      // Bank info
+      el("div", { id: "bank-transfer-info", className: "hidden", style: { backgroundColor: "#e8f5e9", padding: "10px", borderRadius: "5px", marginTop: "10px" } },
+        el("p", { style: { fontWeight: "bold", color: "var(--dark-green)" } }, "Amakuru yo kwishyura kuri Banki:"),
+        el("p", {}, el("strong", {}, "Cooperative Bank: "), state.coopSettings?.coopBankName || "Ntibirabura"),
+        el("p", {}, el("strong", {}, "Cooperative Account: "), state.coopSettings?.coopBankAccount || "Ntibirabura"),
+        el("p", { className: "text-sm text-muted mt-1" }, "Nyuma yo kohereza amafaranga, andika nimero ya transaction (Reference) hano hejuru.")
+      ),
+
+      el("button", { type: "button", className: "btn btn-primary w-full mt-2", onClick: async () => {
+        const amount = parseFloat($("#share-amount").value);
+        const method = $("#share-method").value;
+        const reference = $("#share-reference").value.trim();
+
+        if (!amount || amount <= 0) {
+          showToast("Enter a valid amount.", "error");
+          return;
+        }
+
+        try {
+          showLoading(true);
+          await addDoc(collection(db, "share_contributions"), {
+            cooperativeId: state.cooperativeId, 
+            memberId: state.user.uid,
+            memberName: state.profile?.fullName || "Member", 
+            amount,
+            currency: "RWF",
+            paymentMethod: method,
+            reference: reference || null,
+            status: "pending",           
+            date: serverTimestamp(),
+            createdAt: serverTimestamp()
+          });
+          showToast("Ubwishyu bwawe bwakiriwe. Buzemezwa na Admin nyuma yo kugenzura ko amafaranga yageze kuri konti ya Cooperative.", "success", 8000);
+          document.getElementById("modal-backdrop")?.remove();
+          navigate("my-shares");
+        } catch (err) {
+          showToast("Failed: " + err.message, "error");
+        } finally {
+          showLoading(false);
+        }
+      } }, "Submit Payment")
+    );
+
+    setTimeout(() => {
+      const methodSelect = $("#share-method");
+      const bankInfoDiv = $("#bank-transfer-info");
+      const momoInfoDiv = $("#momo-info");
+
+      if (methodSelect && bankInfoDiv && momoInfoDiv) {
+        methodSelect.addEventListener("change", (e) => {
+          if (e.target.value === "bank_transfer") {
+            bankInfoDiv.classList.remove("hidden");
+            momoInfoDiv.classList.add("hidden");
+          } else if (e.target.value === "mobile_money") {
+            momoInfoDiv.classList.remove("hidden");
+            bankInfoDiv.classList.add("hidden");
+          } else {
+            bankInfoDiv.classList.add("hidden");
+            momoInfoDiv.classList.add("hidden");
+          }
+        });
+      }
+    }, 50);
+
+    openModal("Submit Share Payment", form);
+  }
 }
 
 async function renderMyLoans(container) {
   const uid = state.user.uid;
   const loans = await fetchCollection("loan_applications", [{ field: "memberId", op: "==", value: uid }]);
-  container.appendChild(el("div", { className: "mb-2" },
+  
+  container.appendChild(el("div", { className: "search-bar" },
+    el("input", { type: "text", className: "form-control", placeholder: "Shakisha inguzanyo...", id: "my-loans-search" })
+  ));
+
+  const tableContainer = el("div", { id: "my-loans-table-container" });
+  container.appendChild(tableContainer);
+
+  function renderTable(filtered) {
+    tableContainer.innerHTML = "";
+    if (filtered.length === 0) {
+      tableContainer.appendChild(el("div", { className: "card empty-state" }, el("i", { className: "fas fa-hand-holding-usd" }), el("p", {}, "Nta nguzanyo ubonye.")));
+      return;
+    }
+    tableContainer.appendChild(el("div", { className: "table-wrapper" }, el("table", {},
+      el("thead", {}, el("tr", {}, el("th", {}, "Date"), el("th", {}, "Amount"), el("th", {}, "Purpose"), el("th", {}, "Status"))),
+      el("tbody", {}, ...filtered.map(l =>
+        el("tr", {},
+          el("td", {}, formatDate(l.createdAt || l.applicationDate)),
+          el("td", {}, formatCurrency(l.amount, l.currency)),
+          el("td", {}, l.purpose || "—"),
+          el("td", {}, el("span", { className: "badge badge-" + (l.status || "pending") }, (l.status || "pending").replace("_", " ")))
+        )
+      ))
+    )));
+  }
+
+  $("#my-loans-search")?.addEventListener("input", (e) => {
+    const s = e.target.value.toLowerCase();
+    renderTable(loans.filter(l => 
+      (l.purpose || "").toLowerCase().includes(s) ||
+      (l.amount || "").toString().includes(s) ||
+      (l.status || "").toLowerCase().includes(s)
+    ));
+  });
+
+  renderTable(loans);
+
+  container.appendChild(el("div", { className: "mt-3" },
     el("button", { className: "btn btn-primary", onClick: () => applyForLoan() }, el("i", { className: "fas fa-plus" }), "Apply for Loan")
   ));
-  if (loans.length === 0) {
-    container.appendChild(el("div", { className: "card empty-state" }, el("i", { className: "fas fa-hand-holding-usd" }), el("p", {}, "You have no loan applications.")));
-    return;
-  }
-  container.appendChild(el("div", { className: "table-wrapper" }, el("table", {},
-    el("thead", {}, el("tr", {}, el("th", {}, "Date"), el("th", {}, "Amount"), el("th", {}, "Purpose"), el("th", {}, "Status"))),
-    el("tbody", {}, ...loans.map(l =>
-      el("tr", {},
-        el("td", {}, formatDate(l.createdAt || l.applicationDate)),
-        el("td", {}, formatCurrency(l.amount, l.currency)),
-        el("td", {}, l.purpose || "—"),
-        el("td", {}, el("span", { className: "badge badge-" + (l.status || "pending") }, (l.status || "pending").replace("_", " ")))
-      )
-    ))
-  )));
+
   function applyForLoan() {
     const form = el("div", {},
       formGroup("Amount (RWF)", "loan-amount", "number", true),
@@ -1591,27 +2100,50 @@ async function renderMyLoans(container) {
 async function renderMyTransactions(container) {
   const uid = state.user.uid;
   const tx = await fetchCollection("transactions", [{ field: "userId", op: "==", value: uid }]);
-  if (tx.length === 0) {
-    container.appendChild(el("div", { className: "card empty-state" }, el("i", { className: "fas fa-exchange-alt" }), el("p", {}, "You have no transactions.")));
-    return;
+  
+  container.appendChild(el("div", { className: "search-bar" },
+    el("input", { type: "text", className: "form-control", placeholder: "Shakisha ibikorwa...", id: "my-tx-search" })
+  ));
+
+  const tableContainer = el("div", { id: "my-tx-table-container" });
+  container.appendChild(tableContainer);
+
+  function renderTable(filtered) {
+    tableContainer.innerHTML = "";
+    if (filtered.length === 0) {
+      tableContainer.appendChild(el("div", { className: "card empty-state" }, el("i", { className: "fas fa-exchange-alt" }), el("p", {}, "Nta bikorwa ubonye.")));
+      return;
+    }
+    tableContainer.appendChild(el("div", { className: "table-wrapper" }, el("table", {},
+      el("thead", {}, el("tr", {}, el("th", {}, "Date"), el("th", {}, "Type"), el("th", {}, "Amount"), el("th", {}, "Description"))),
+      el("tbody", {}, ...filtered.map(t =>
+        el("tr", {},
+          el("td", {}, formatDate(t.createdAt || t.date)),
+          el("td", {}, t.type || t.category || "—"),
+          el("td", {}, formatCurrency(t.amount, t.currency)),
+          el("td", {}, t.description || "—")
+        )
+      ))
+    )));
   }
-  container.appendChild(el("div", { className: "table-wrapper" }, el("table", {},
-    el("thead", {}, el("tr", {}, el("th", {}, "Date"), el("th", {}, "Type"), el("th", {}, "Amount"), el("th", {}, "Description"))),
-    el("tbody", {}, ...tx.map(t =>
-      el("tr", {},
-        el("td", {}, formatDate(t.createdAt || t.date)),
-        el("td", {}, t.type || t.category || "—"),
-        el("td", {}, formatCurrency(t.amount, t.currency)),
-        el("td", {}, t.description || "—")
-      )
-    ))
-  )));
+
+  $("#my-tx-search")?.addEventListener("input", (e) => {
+    const s = e.target.value.toLowerCase();
+    renderTable(tx.filter(t => 
+      (t.description || "").toLowerCase().includes(s) ||
+      (t.type || "").toLowerCase().includes(s) ||
+      (t.amount || "").toString().includes(s)
+    ));
+  });
+
+  renderTable(tx);
 }
 
 // ============================================================
 // INIT
 // ============================================================
 function init() {
+  setupAddressDropdowns();
   bindLoginButton();
   bindRegisterButton();
 }
